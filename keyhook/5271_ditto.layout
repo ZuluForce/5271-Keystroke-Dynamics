@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="ditto" />
+	<File name="Makefile" open="1" top="1" tabpos="1">
+		<Cursor position="418" topLine="2" />
+	</File>
+	<File name="include\ditto.h" open="1" top="0" tabpos="4">
+		<Cursor position="145" topLine="0" />
+	</File>
+	<File name="include\profile_loader.h" open="1" top="0" tabpos="8">
+		<Cursor position="601" topLine="0" />
+	</File>
+	<File name="src\ditto.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="3450" topLine="81" />
+	</File>
+</CodeBlocks_layout_file>
