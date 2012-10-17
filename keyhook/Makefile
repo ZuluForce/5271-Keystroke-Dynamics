@@ -17,13 +17,16 @@ CFLAGS=-O1
 vpath %.c $(SRCDIR)
 vpath %.cpp $(SRCDIR)
 vpath %.cpp $(SRCDIR)/loaders
+vpath %.cpp $(SRCDIR)/generate
 
 vpath %.h $(INCDIR)
 vpath %.h $(INCDIR)/loaders
 
 vpath %.o $(OBJDIR)
 
+_DITTO_OBJS=profile_loader.o known_ploaders.o fs_loader.o
 _OBJS= utils.o profile_loader.o known_ploaders.o fs_loader.o
+DITTO_OBJS=$(patsubst %,$(OBJDIR)/%,$(_DITTO_OBJS))
 OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
@@ -41,8 +44,11 @@ x2y: intercept_example.cpp interception.h utils.o
 ditto_cap: ditto_capture.cpp interception.h $(OBJS)
 	$(CC) -I$(INCDIR) -L$(LIBDIR) $^ -o $(BINDIR)/ditto_cap $(LIBDIR)/libinterception.so
 
-ditto: ditto.cpp ditto.h $(OBJS)
+ditto: ditto.cpp ditto.h $(DITTO_OBJS)
 	$(CC) -I$(INCDIR) $^ -o $(BINDIR)/$@
+
+gen_fs_loader: gen_fs_loader_profile.cpp fs_loader.h
+	$(CC) -I$(INCDIR) $^ -o $(BINDIR)/generators/$@
 
 .PHONY: clean
 clean:

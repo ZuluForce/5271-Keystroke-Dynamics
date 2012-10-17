@@ -119,7 +119,17 @@ int main(int argc, char* argv[]) {
 
 	// Get the profile loader
 	DittoProfileLoader* loader = getProfiler(options->profileType, options->profileInfo);
-	std::cout << "Current profile loader name: " << loader->getProfileLoaderName() << std::endl;
+	if (loader == NULL) {
+		std::cout << "No profile loader found for type: " << options->profileType << std::endl;
+		exit(1);
+	}
+	std::cout << "\nCurrent profile loader name: " << loader->getProfileLoaderName() << std::endl;
+
+	KDProfile profile = KDProfile();
+	setKDProfileSize(profile);
+	loader->loadProfile(profile);
+
+	//printKDProfile(profile);
 
     return 0;
 }
