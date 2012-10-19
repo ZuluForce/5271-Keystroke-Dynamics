@@ -93,7 +93,7 @@ int checkRequiredOptions(DittoOptions* options) {
 	}
 
 	if (options->profileInfo == NULL) {
-		std::cerr << "Missing profile information to give to loader" << std::endl;
+		std::cerr << "Missing profile information for loader" << std::endl;
 		good = false;
 	}
 
@@ -103,6 +103,7 @@ int checkRequiredOptions(DittoOptions* options) {
 
 int main(int argc, char* argv[]) {
 	std::cout << "A wild ditto appeared" << std::endl;
+
     DittoOptions* options = parseCmdLine(argc, argv);
 
 	//Check that the fields got set
@@ -127,9 +128,17 @@ int main(int argc, char* argv[]) {
 
 	KDProfile profile = KDProfile();
 	setKDProfileSize(profile);
-	loader->loadProfile(profile);
+
+	int status;
+	status = loader->loadProfile(profile);
+	if (status) {
+		std::cerr << "Failed to load profile" << std::endl;
+		exit(status);
+	}
 
 	//printKDProfile(profile);
+	BasicProfileEnforcer enforcer = BasicProfileEnforcer();
+	enforcer.enforce(profile);
 
     return 0;
 }

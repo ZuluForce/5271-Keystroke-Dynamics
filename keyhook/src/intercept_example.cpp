@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <interception.h>
+#include <chrono>
+#include "chrono_io"
 #include "utils.h"
 
 enum ScanCode {
@@ -14,15 +16,15 @@ int main() {
     InterceptionContext context;
     InterceptionDevice device;
     InterceptionKeyStroke stroke;
-    
+
     raise_process_priority();
-    
+
     context = interception_create_context();
 	if (context == NULL) {
 		fprintf(stderr, "Failed to initizlize interception context\n");
 		return -1;
 	}
-    
+
     interception_set_filter(context, interception_is_keyboard, INTERCEPTION_FILTER_KEY_DOWN | INTERCEPTION_FILTER_KEY_UP);
 
     while(interception_receive(context, device = interception_wait(context), (InterceptionStroke *)&stroke, 1) > 0) {

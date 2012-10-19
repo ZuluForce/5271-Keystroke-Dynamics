@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "known_ploaders.h"
+#include "enforcers/basic_enforcer.h"
 
 struct DittoOptions {
     char* profileType; // Tells ditto which loader to use (-l flag)

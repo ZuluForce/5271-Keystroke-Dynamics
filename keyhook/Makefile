@@ -7,7 +7,7 @@ LIBDIR=lib
 BINDIR=bin
 
 INTERCEPT_LIB=interception
-CFLAGS=-O1
+CFLAGS=-O1 -std=c++11
 
 ## How to build the shared object file such as libinterception.so
 ##
@@ -18,13 +18,16 @@ vpath %.c $(SRCDIR)
 vpath %.cpp $(SRCDIR)
 vpath %.cpp $(SRCDIR)/loaders
 vpath %.cpp $(SRCDIR)/generate
+vpath %.cpp $(SRCDIR)/enforcers
 
 vpath %.h $(INCDIR)
 vpath %.h $(INCDIR)/loaders
+vpath %.h $(INCDIR)/enforcers
 
 vpath %.o $(OBJDIR)
 
-_DITTO_OBJS=profile_loader.o known_ploaders.o fs_loader.o
+_DITTO_OBJS=profile_loader.o profile_enforcer.o known_ploaders.o profile_enforcer.o\
+			fs_loader.o basic_enforcer.o
 _OBJS= utils.o profile_loader.o known_ploaders.o fs_loader.o
 DITTO_OBJS=$(patsubst %,$(OBJDIR)/%,$(_DITTO_OBJS))
 OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
@@ -45,7 +48,7 @@ ditto_cap: ditto_capture.cpp interception.h $(OBJS)
 	$(CC) -I$(INCDIR) -L$(LIBDIR) $^ -o $(BINDIR)/ditto_cap $(LIBDIR)/libinterception.so
 
 ditto: ditto.cpp ditto.h $(DITTO_OBJS)
-	$(CC) -I$(INCDIR) $^ -o $(BINDIR)/$@
+	$(CC) -I$(INCDIR) $^ -o $(BINDIR)/$@ $(CFLAGS)
 
 gen_fs_loader: gen_fs_loader_profile.cpp fs_loader.h
 	$(CC) -I$(INCDIR) $^ -o $(BINDIR)/generators/$@

@@ -7,7 +7,7 @@
 
 #define MAX_CHAR 127
 
-// Since ditto likely will have to support loading profiles from multiple
+// Since ditto will likely have to support loading profiles from multiple
 // places I am creating an abstract base class as an interface
 
 typedef std::vector<std::vector<int> > KDProfile;

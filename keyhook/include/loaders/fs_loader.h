@@ -18,7 +18,7 @@ struct FSProfileUnit {
 
 class FSProfileLoader: public DittoProfileLoader {
 public:
-	FSProfileLoader(std::string data);
+	FSProfileLoader(std::string);
 
 	int loadProfile(KDProfile&);
 	int loadProfile(KDProfile&,KDProfileID&);
