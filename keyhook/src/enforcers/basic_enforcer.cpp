@@ -5,12 +5,21 @@ BasicProfileEnforcer::BasicProfileEnforcer() {
 	return;
 }
 
+void BasicProfileEnforcer::dispatcher() {
+	ChronoStopwatch watch = ChronoStopwatch();
+	PendingStroke* stroke = NULL;
+
+	while(stroke = this->strokeQueue.pop()) {
+
+	}
+}
+
 
 void BasicProfileEnforcer::enforce(KDProfile& profile) {
 	typedef std::chrono::high_resolution_clock Clock;
 	auto t1 = Clock::now();
 	auto t2 = Clock::now();
-	std::cout << t2-t1 << " nanoseconds \n";
+	std::cout << (t2-t1).count() << " nanoseconds \n";
 
 	InterceptionContext context;
 	InterceptionDevice device;
@@ -28,13 +37,13 @@ void BasicProfileEnforcer::enforce(KDProfile& profile) {
 	int timing;
 	std::map<unsigned int, char>::iterator stcIter, stcEnd;
 
-	prevKey = NULL;
-	stcEnd = DittoProfileEnforcer.scancodeToChar.end();
+	prevKey = '\0';
+	stcEnd = DittoProfileEnforcer::scancodeToChar.end();
 
 	interception_set_filter(context, interception_is_keyboard, INTERCEPTION_FILTER_KEY_DOWN | INTERCEPTION_FILTER_KEY_UP);
 	while (interception_receive(context, device = interception_wait(context), (InterceptionStroke *)&stroke, 1) > 0) {
 		// Lookup the scancode in the map
-		stcIter = DittoProfileEnforcer.scancodeToChar.find(stroke.code);
+		stcIter = DittoProfileEnforcer::scancodeToChar.find(stroke.code);
 		if (stcIter == stcEnd) {
 			std::cerr << "Unmapped scancode: " << stroke.code << std::endl;
 
@@ -44,14 +53,14 @@ void BasicProfileEnforcer::enforce(KDProfile& profile) {
 			continue;
 		}
 
-		key = stcIter->first;
-		if (prevKey == NULL) {
+		nextKey = stcIter->first;
+		if (prevKey == '\0') {
 			// This means it is the first key press so we don't have any time info to go
 			// on so just send the stroke
-			prevKey = key;
+			prevKey = nextKey;
 			interception_send(context, device, (InterceptionStroke *)&stroke, 1);
 			continue;
 		}
-		timing = profile.get()
+		timing = profile.at(prevKey).at(nextKey);
 	}
 }

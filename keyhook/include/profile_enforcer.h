@@ -10,9 +10,9 @@ class DittoProfileEnforcer {
 private:
 
 public:
-	static std::map<unsigned int, char> const scancodeToChar;
+	static std::map<unsigned int, char> scancodeToChar;
 
-	virtual void enforce(KDProfile&);
+	virtual void enforce(KDProfile&) = 0;
 
 };
 
