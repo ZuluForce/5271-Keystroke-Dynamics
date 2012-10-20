@@ -10,7 +10,7 @@
 // Since ditto will likely have to support loading profiles from multiple
 // places I am creating an abstract base class as an interface
 
-typedef std::vector<std::vector<int> > KDProfile;
+typedef std::vector<std::vector<int64_t> > KDProfile;
 void setKDProfileSize(KDProfile& profile, size_t size=127);
 void printKDProfile(KDProfile& profile);
 
