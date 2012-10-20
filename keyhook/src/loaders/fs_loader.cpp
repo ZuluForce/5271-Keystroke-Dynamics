@@ -69,6 +69,7 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 		++numRead;
 	}
 
+	std::cout << "\tFSProfileLoader finished loading" << std::endl;
 	fclose(input);
 	return 0;
 }

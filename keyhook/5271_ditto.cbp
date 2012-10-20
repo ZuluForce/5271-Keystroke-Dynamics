@@ -99,6 +99,11 @@
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
+		<Unit filename="include\util\timer.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="ditto" />
+		</Unit>
 		<Unit filename="include\utils.h">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -142,6 +147,11 @@
 			<Option target="ditto" />
 		</Unit>
 		<Unit filename="src\profile_loader.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="ditto" />
+		</Unit>
+		<Unit filename="src\util\timer.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />

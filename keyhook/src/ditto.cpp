@@ -21,6 +21,8 @@ int destroyOptionStruct(DittoOptions* options) {
 	free(options->profileInfo);
 	free(options->profileType);
 	free(options);
+
+	return 0;
 }
 
 int readFlagValue(char** dst, char* src, int flagLen) {
@@ -137,7 +139,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	//printKDProfile(profile);
-	BasicProfileEnforcer enforcer = BasicProfileEnforcer();
+	BasicProfileEnforcer enforcer;
 	enforcer.enforce(profile);
 
     return 0;

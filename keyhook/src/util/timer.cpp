@@ -1,57 +1,60 @@
 #include "util/timer.h"
 
 ChronoStopwatch::ChronoStopwatch() {
+	precision = (double) high_resolution_clock::period::num / high_resolution_clock::period::den;
 	return;
 }
 
-void ChronoStopwatch::reset() {
-	startTime = endTime = lastLap = -1;
+microseconds ChronoStopwatch::getDuration(ChronoClockPoint start, ChronoClockPoint end) {
+	auto duration = duration_cast<microseconds>(end - start);
+	return duration;
+}
 
-	this.laps.resize(0);
+void ChronoStopwatch::reset() {
+	//startTime = endTime = -1;
+	running = false;
 }
 
 void ChronoStopwatch::start() {
-	startTime = this->clock::now();
+	if (running) {
+		std::cerr << "Tried to start ChronoClock while already running" << std::endl;
+		return;
+	}
+
+	startTime = ChronoClock::now();
 	lastLap = startTime;
+
+	running = true;
 }
 
-long ChronoStopwatch::stop() {
-	if (startTime < 0)
-		throw new ChronoSWException("Stopwatch not started. Cannot stop");
+int64_t ChronoStopwatch::stop() {
+	if (!running)
+		return -1;
 
-	endTime = this->clock::now();
+	running = false;
 
-	return endTime - startTime;
+	endTime = ChronoClock::now();
+	return this->getDuration(startTime, endTime).count();
 }
 
-long ChronoStopwatch::checkTime() {
-	if (startTime < 0)
-		throw new ChronoSWException("Stopwatch not started. Cannot checkTime()");
+int64_t ChronoStopwatch::checkTime() {
+	if (!running)
+		return -1;
 
-	long t = this->clock::now();
-	return (t-startTime);
+	ChronoClock::time_point timeNow = ChronoClock::now();
+	return this->getDuration(startTime, timeNow).count();
 }
 
-long ChronoStopwatch::takeLap() {
-	if (startTime < 0 || laptime < 0)
-		throw new ChronoSWException("Stopwatch not started. Cannot takeLap()");
+int64_t ChronoStopwatch::lap() {
+	if (!running)
+		return -1;
 
-	long now, laptime;
-	now = this->clock::now();
-	laptime = lastLap;
+	ChronoClockPoint timeNow = ChronoClock::now();
+	int64_t laptime = this->getDuration(lastLap, timeNow).count();
 
-	this->laps.push_back(laptime);
-}
+	lastLap = timeNow;
 
-long ChronoStopwatch::getLapTime(int lapNumber) {
-	if (lapNumber >= this->laps.size())
-		throw new ChronoSWException("Out of range lap number: " + lapNumber);
-
-	return this->laps.at(lapNumber);
-}
-
-int ChronoStopwatch::LapCount() {
-	return this->laps.size();
+	return laptime;
 }
 
 

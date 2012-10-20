@@ -1,18 +1,28 @@
 #ifndef TIMER_H_INCLUDED
 #define TIMER_H_INCLUDED
 
+#include <ctime>
+#include <ratio>
 #include <chrono>
 #include <string>
 #include <vector>
+#include <iostream>
 
-typedef std::chrono::high_resolution_clock ChronoClock;
+using namespace std::chrono;
+
+typedef high_resolution_clock ChronoClock;
+typedef high_resolution_clock::time_point ChronoClockPoint;
 
 class ChronoStopwatch {
 private:
 	ChronoClock clock;
-	long startTime,endTime,lastLap;
+	ChronoClockPoint startTime,endTime, lastLap;
 
-	std::vector<long> laps;
+	microseconds getDuration(ChronoClockPoint start, ChronoClockPoint end);
+
+	bool running;
+
+	double precision;
 
 public:
 	ChronoStopwatch();
@@ -32,22 +42,20 @@ public:
 	 * again to get the same elapsed time. If the stopwatch was not started
 	 * before this is called, a ChronoSWException will be thrown.
 	 */
-	long stop();
+	int64_t stop();
 
 	/**
 	 * While the timer is still running check the current time. This is measured
 	 * from the time start() was called.
 	 */
-	long checkTime();
-
-	long takeLap();
+	int64_t checkTime();
 
 	/**
-	 * Request the time for a particular lap. Zero indexed.
+	 * Basic lap functionality like a real stopwatch. Gives you the time difference since
+	 * the last time you called lap or start if it is the first time you have called it since
+	 * the last start.
 	 */
-	long getLapTime(int lapNumber);
-
-	int LapCount();
+	int64_t lap();
 };
 
 class ChronoSWException {

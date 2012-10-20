@@ -5,9 +5,15 @@
 #include "utils.h"
 
 enum ScanCode {
-    SCANCODE_X   = 0x2D,
-    SCANCODE_Y   = 0x15,
-    SCANCODE_ESC = 0x01
+	SCANCODE_Z		= 0x2C,
+    SCANCODE_X   	= 0x2D,
+    SCANCODE_C		= 0x2E,
+    SCANCODE_V		= 0x2F,
+    SCANCODE_B		= 0x30,
+    SCANCODE_N		= 0x31,
+    SCANCODE_M		= 0x32,
+    SCANCODE_Y   	= 0x15,
+    SCANCODE_ESC 	= 0x01
 };
 
 int main() {
