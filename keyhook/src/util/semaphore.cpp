@@ -16,6 +16,5 @@ void semaphore::wait() {
 	while(count_ == 0)
 		condition_.wait(lock);
 
-	std::cout << "Semaphore wait returning" << std::endl;
 	--count_;
 }

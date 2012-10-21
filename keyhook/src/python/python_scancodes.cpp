@@ -1,6 +1,7 @@
 #ifndef PYTHONSCANCODES_H_INCLUDED
 #define PYTHONSCANCODES_H_INCLUDED
 
+#include <cmath> // Must have this right here otherwise mingw builds will break
 #include <boost/python/enum.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/module.hpp>
@@ -46,7 +47,7 @@ BOOST_PYTHON_MODULE(DittoPyScancodes)
         .value("SCANCODE_J"		, SCANCODE_J)
         .value("SCANCODE_K"		, SCANCODE_K)
         .value("SCANCODE_L"		, SCANCODE_L)
-        .value("SCANCODE_LSHIFT", SCANCODE_LSHFT)
+        .value("SCANCODE_LSHFT", SCANCODE_LSHFT)
         .value("SCANCODE_Z"		, SCANCODE_Z)
         .value("SCANCODE_X"		, SCANCODE_X)
         .value("SCANCODE_C"		, SCANCODE_C)
@@ -54,7 +55,8 @@ BOOST_PYTHON_MODULE(DittoPyScancodes)
         .value("SCANCODE_B"		, SCANCODE_B)
         .value("SCANCODE_N"		, SCANCODE_N)
         .value("SCANCODE_M"		, SCANCODE_M)
-        .value("SCANCODE_RSHIFT", SCANCODE_RSHFT)
+        .value("SCANCODE_RSHFT", SCANCODE_RSHFT)
+        .value("SCANCODE_SPACE"	, SCANCODE_SPACE)
         .export_values();
 
     def("identity", identity_);

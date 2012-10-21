@@ -57,6 +57,40 @@ int64_t ChronoStopwatch::lap() {
 	return laptime;
 }
 
+ChronoMicroDuration ChronoStopwatch::lapDuration() {
+	if (!running)
+		throw new ChronoSWException("Cannot take lap when sw isn't running");
+
+	ChronoClockPoint timeNow = ChronoClock::now();
+	microseconds lapD = this->getDuration(lastLap, timeNow);
+	lastLap = timeNow;
+
+	return lapD;
+}
+
+ChronoClockPoint ChronoStopwatch::lastLapTotalTime() {
+	return lastLap;
+}
+
+/* --- Static ChronoStopwatch Methods --- */
+ChronoMicroDuration ChronoStopwatch::durationFromMicro(int64_t t) {
+	return ChronoMicroDuration(t);
+}
+
+ChronoClockPoint ChronoStopwatch::getFutureTimePoint(ChronoClockPoint& point, ChronoMicroDuration& duration) {
+	return point + duration;
+}
+
+ChronoMicroDuration ChronoStopwatch::getDurationDifference(ChronoMicroDuration& d1,ChronoMicroDuration& d2) {
+	return duration_cast<ChronoMicroDuration>(d1 - d2);
+}
+
+ChronoBoostPoint ChronoStopwatch::toBoostTimePoint(ChronoClockPoint& point) {
+	ChronoBoostPoint t(boost::chrono::microseconds(point.time_since_epoch().count()));
+
+	return t;
+}
+
 
 ChronoSWException::ChronoSWException(std::string msg) {
 	this->msg = msg;

@@ -121,15 +121,14 @@ int main(int argc, char* argv[]) {
 	std::cout << "\tProfile Info: " << options->profileInfo << std::endl;
 
 	// Get the profile loader
-	DittoProfileLoader* loader = getProfiler(options->profileType, options->profileInfo);
+	DittoProfileLoader* loader = getProfileLoader(options->profileType, options->profileInfo);
 	if (loader == NULL) {
 		std::cout << "No profile loader found for type: " << options->profileType << std::endl;
 		exit(1);
 	}
 	std::cout << "\nCurrent profile loader name: " << loader->getProfileLoaderName() << std::endl;
 
-	KDProfile profile = KDProfile();
-	setKDProfileSize(profile);
+	KDProfile profile = KDProfile(100);
 
 	int status;
 	status = loader->loadProfile(profile);
@@ -138,7 +137,6 @@ int main(int argc, char* argv[]) {
 		exit(status);
 	}
 
-	//printKDProfile(profile);
 	BasicProfileEnforcer enforcer;
 	enforcer.enforce(profile);
 

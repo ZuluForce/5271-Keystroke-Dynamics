@@ -10,8 +10,11 @@ INTERCEPT_LIB=interception
 CFLAGS=-O1 -std=c++0x -Wall
 LFLAGS=-lboost_system -lboost_thread -lboost_chrono
 
+EXPORT_FLAG=-W1,--export-dynamic
+
 # For exporting the boost::python libraries
 PYTHON_VER=2.7
+PYTHON_VER_WIN=32
 
 PYTHON=/usr/include/python$(PYTHON_VER)
 BOOST_INC=/usr/include
@@ -20,8 +23,12 @@ BOOST_LIB=/usr/lib
 PYTHON_OBJ=$(OBJDIR)/python
 
 PYTHON_OUT_LIB=lib/python
+PYTHON_LIB=boost_python
 
 SYS_LIBDIR=/usr/local/lib
+
+CPY_CMD=cp -v
+ROOT_CPY_CMD=sudo $(CPY_CMD)
 
 ## Names of individual python modules as defined in C++ under BOOST_PYTHON_MODULE
 ## It is importatnt that the final name be the same as defined here because python
@@ -82,23 +89,29 @@ ditto: ditto.cpp ditto.h $(DITTO_OBJS) $(UTIL_OBJS)
 	$(CC) -static -I$(INCDIR) -L$(LIBDIR) $^ -o $(BINDIR)/$@ $(CFLAGS) $(LFLAGS) $(LIBDIR)/libinterception.so
 
 gen_fs_loader: gen_fs_loader_profile.cpp fs_loader.h
-	$(CC) -I$(INCDIR) $^ -o $(BINDIR)/generators/$@
+	$(CC) -I$(INCDIR) $^ -o $(BINDIR)/generators/$@ $(CFLAGS) -lboost_system
 
 
 $(PYTHON_OUT_LIB)/%.so:
-	$(CC) -shared -W1,--export-dynamic $(PYTHON_OBJ)/$*.o \
-	-L$(BOOST_LIB) -lboost_python -L/usr/lib/python$(PYTHON_VER)/config \
+	$(CC) -shared $(PYTHON_OBJ)/$*.o \
+	-L$(BOOST_LIB) -l$(PYTHON_LIB) -L/usr/lib/python$(PYTHON_VER)/config \
 	-lpython$(PYTHON_VER) -o $@
 
 $(PYTHON_OBJ)/$(PY_SCANCODES).o: python_scancodes.cpp profile_enforcer.h
 	$(CC) -fPIC -I$(PYTHON) -I$(INCDIR) -I$(BOOST_INC) -c $< -o $@
 
 python_scan_codes: $(PYTHON_OBJ)/$(PY_SCANCODES).o $(PYTHON_OUT_LIB)/$(PY_SCANCODES).so
-	sudo cp -v $(PYTHON_OUT_LIB)/$(PY_SCANCODES).so $(SYS_LIBDIR)/
 	@echo "Finished building scancodes enum for python\n"
 
 all_python: python_scan_codes
+	$(ROOT_CPY_CMD) $(EXPORT_FLAG) $(PYTHON_OUT_LIB)/*.so $(SYS_LIBDIR)/
 	@echo "\nFinished building all C++ code exported for python\n"
+
+all_python_win:
+	make PYTHON_VER=$(PYTHON_VER_WIN) PYTHON=C:\Python$(PYTHON_VER_WIN)\include \
+	SYS_LIBDIR=C:\Python$(PYTHON_VER_WIN)\DLLs CPY_CMC=COPY ROOT_CPY_CMD=COPY \
+	BOOST_INC=C:\MinGW\include BOOST_LIB=C:\MinGW\lib PYTHON_LIB=boost_python3 \
+	EXPORT_FLAG= all_python
 
 .PHONY: clean
 .PHONY: clean_python

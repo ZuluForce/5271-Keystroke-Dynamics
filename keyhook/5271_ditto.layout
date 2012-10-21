@@ -1,69 +1,64 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="ditto" />
-	<File name="include/profile_enforcer.h" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1466" topLine="0" />
-		</Cursor>
+	<File name="Makefile" open="1" top="1" tabpos="1">
+		<Cursor position="2505" topLine="69" />
 	</File>
-	<File name="src/ditto.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
+	<File name="include\ditto.h" open="0" top="0" tabpos="6">
+		<Cursor position="185" topLine="0" />
 	</File>
-	<File name="src/python/python_scancodes.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="317" topLine="0" />
-		</Cursor>
+	<File name="include\enforcers\basic_enforcer.h" open="1" top="0" tabpos="4">
+		<Cursor position="626" topLine="9" />
 	</File>
-	<File name="src/profile_loader.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
+	<File name="include\interception.h" open="0" top="0" tabpos="0">
+		<Cursor position="5773" topLine="123" />
 	</File>
-	<File name="src/ditto_capture.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
+	<File name="include\known_ploaders.h" open="0" top="0" tabpos="0">
+		<Cursor position="331" topLine="0" />
 	</File>
-	<File name="Makefile" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2692" topLine="78" />
-		</Cursor>
+	<File name="include\loaders\fs_loader.h" open="0" top="0" tabpos="9">
+		<Cursor position="694" topLine="4" />
 	</File>
-	<File name="src/profile_enforcer.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="29" topLine="0" />
-		</Cursor>
+	<File name="include\profile_enforcer.h" open="0" top="0" tabpos="6">
+		<Cursor position="1451" topLine="21" />
 	</File>
-	<File name="src/generate/gen_fs_loader_profile.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
+	<File name="include\profile_loader.h" open="1" top="0" tabpos="6">
+		<Cursor position="1205" topLine="0" />
 	</File>
-	<File name="src/loaders/fs_loader.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
+	<File name="include\util\timer.h" open="1" top="0" tabpos="5">
+		<Cursor position="1932" topLine="50" />
 	</File>
-	<File name="include/ditto.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
+	<File name="src\ditto.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="656" topLine="6" />
 	</File>
-	<File name="src/intercept_example.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
+	<File name="src\ditto_capture.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="include/loaders/fs_loader.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
+	<File name="src\enforcers\basic_enforcer.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="1402" topLine="21" />
 	</File>
-	<File name="include/profile_loader.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="325" topLine="0" />
-		</Cursor>
+	<File name="src\generate\gen_fs_loader_profile.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="1074" topLine="54" />
+	</File>
+	<File name="src\intercept_example.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="110" topLine="0" />
+	</File>
+	<File name="src\loaders\fs_loader.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="2327" topLine="34" />
+	</File>
+	<File name="src\profile_enforcer.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="309" topLine="0" />
+	</File>
+	<File name="src\profile_loader.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="517" topLine="31" />
+	</File>
+	<File name="src\python\python_scancodes.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1636" topLine="25" />
+	</File>
+	<File name="src\util\semaphore.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="376" topLine="0" />
+	</File>
+	<File name="src\util\timer.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2439" topLine="60" />
 	</File>
 </CodeBlocks_layout_file>

@@ -1,6 +1,6 @@
 #include "known_ploaders.h"
 
-DittoProfileLoader* getProfiler(std::string name, std::string data) {
+DittoProfileLoader* getProfileLoader(std::string name, std::string data) {
 	DittoProfileLoader* loader = NULL;
 
 	// General filesystem profile loader.

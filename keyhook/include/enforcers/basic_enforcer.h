@@ -17,19 +17,46 @@
 
 struct PendingStroke {
 	InterceptionKeyStroke stroke;
+	ChronoMicroDuration wait_time;
+};
+
+struct KeyDownHist {
+	// When the key down event was received
+	ChronoClockPoint kd_received;
+
+	// How long we were specified to wait before sending
+	ChronoMicroDuration kd_wait;
 };
 
 class BasicProfileEnforcer: public DittoProfileEnforcer {
 private:
-	boost::mutex dq_mutex;
-	semaphore dq_sem;
+	boost::mutex dq_mutex, du_mutex, dd_mutex;
+
+	/* dq_Sem - dispatchQueue semaphore
+	 * du_sem - dispatchUp queue semaphore
+	 * dd_sem - dispatchDown queue semaphore
+	 */
+	semaphore dq_sem, du_sem, dd_sem;
 	std::queue<PendingStroke*> dispatchQueue;
 	KDProfile* profileRef;
 
-	void dispatcher();
+	// For the dispatchUp and dispatchDown threads repectively
+	std::queue<PendingStroke*> dispatchUpQueue;
+	std::queue<PendingStroke*> dispatchDownQueue;
+
+	// This is necessary for the dispathReceiver to calcualte times
+	// for the appropriate key up events
+	std::map<int, KeyDownHist> dispatchDownHist;
+
+	void dispatchUp();
+	void dispatchDown();
 	void dispatchReceiver();
 	void addToDispatch(PendingStroke*);
 	PendingStroke* getFromDispatch();
+
+	// Generic methods for any queue. Could get rid of the other dispatchQueue methods
+	void addToQueue(std::queue<PendingStroke*>&,PendingStroke*,boost::mutex&,semaphore&);
+	PendingStroke* getFromQueue(std::queue<PendingStroke*>&, boost::mutex&, semaphore&);
 
 	// Some shared state for the capture and dispatch
 	InterceptionContext context;

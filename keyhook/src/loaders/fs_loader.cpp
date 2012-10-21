@@ -33,15 +33,21 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 		// Should throw some sort of exception here
 		std::cerr << "Failed to open profile file" << std::endl;
 		std::cerr << "Error: " << strerror(errno) << std::endl;
-		return -1;
+		std::cerr << "Trying with .fs_kdprof extension" << std::endl;
+
+		std::string name = id.getProfileName() + ".fs_kdprof";
+		input = fopen(name.c_str(), "rb");
+		if (input == NULL) {
+			std::cerr << "Failed to open again" << std::endl;
+			return -1;
+		}
 	}
 
-	size_t read, numRead;
+	size_t read, numRead = 0;
 	size_t unitSize = sizeof(FSProfileUnit);
 	FSProfileUnit unit;
 
-	int from_index, to_index, max_index;
-	max_index = profile.size();
+	int from_index, to_index;
 
 	while (!feof(input)) {
 		read = fread(&unit, unitSize, 1, input);
@@ -56,16 +62,19 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 			return -1;
 		}
 		//Otherwise we got what we believe is a valid profile
-		from_index = (int) unit.from_key;
+		from_index = (int) unit.from_key; // Originally a ScanCode enum value
 		to_index = (int) unit.to_key;
-		if (from_index >= max_index || to_index >= max_index) {
-			std::cerr << "Invalid from/to_key value: from = " << from_index;
-			std::cerr << " to = " << to_index << " max = " << max_index << std::endl;
+
+		if (unit.time_type == FLY_TIME) {
+			profile.addFlyTime(from_index, to_index, unit.time_in_ms * MICRO_IN_MILLI);
+		} else if (unit.time_type == PRESS_TIME) {
+			profile.addPressTime(from_index, unit.time_in_ms * MICRO_IN_MILLI);
+		} else {
+			std::cerr << "Unknown time tpye in the loaded FSProfileUnit: " << unit.time_type << std::endl;
 			fclose(input);
 			return -1;
 		}
 
-		profile.at(from_index).at(to_index) = unit.time_in_ms;
 		++numRead;
 	}
 

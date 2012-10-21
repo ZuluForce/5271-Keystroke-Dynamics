@@ -7,11 +7,17 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <boost/chrono.hpp>
 
 using namespace std::chrono;
 
+typedef std::chrono::milliseconds ChronoMilliDuration;
+typedef std::chrono::microseconds ChronoMicroDuration;
+
 typedef high_resolution_clock ChronoClock;
-typedef high_resolution_clock::time_point ChronoClockPoint;
+typedef ChronoClock::time_point ChronoClockPoint;
+
+typedef boost::chrono::time_point<boost::chrono::high_resolution_clock, boost::chrono::microseconds> ChronoBoostPoint;
 
 class ChronoStopwatch {
 private:
@@ -56,6 +62,23 @@ public:
 	 * the last start.
 	 */
 	int64_t lap();
+
+	ChronoMicroDuration lapDuration();
+
+	/**
+	 * What was the total time (from startTime) of the lastLap?
+	 */
+	ChronoClockPoint lastLapTotalTime();
+
+
+	/* --- Static Methods --- */
+	static ChronoMicroDuration durationFromMicro(int64_t);
+	static ChronoClockPoint getFutureTimePoint(ChronoClockPoint&, ChronoMicroDuration& );
+
+	// Result: d1 - d2
+	static ChronoMicroDuration getDurationDifference(ChronoMicroDuration&,ChronoMicroDuration&);
+
+	static ChronoBoostPoint toBoostTimePoint(ChronoClockPoint&);
 };
 
 class ChronoSWException {

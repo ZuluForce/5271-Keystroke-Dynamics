@@ -50,6 +50,7 @@ enum ScanCode {
     SCANCODE_N		= 0x31, // 49
     SCANCODE_M		= 0x32, // 50
     SCANCODE_RSHFT	= 0x36, // 54
+    SCANCODE_SPACE	= 0x39, // 57
 };
 
 // Be sure to update if we map new scancodes
