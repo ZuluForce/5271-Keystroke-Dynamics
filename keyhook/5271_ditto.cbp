@@ -157,6 +157,11 @@
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
+		<Unit filename="src\util\print_fsloader_sizes.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="ditto" />
+		</Unit>
 		<Unit filename="src\util\semaphore.cpp" />
 		<Unit filename="src\util\timer.cpp">
 			<Option target="Debug" />

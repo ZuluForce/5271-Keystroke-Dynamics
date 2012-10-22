@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="ditto" />
-	<File name="Makefile" open="1" top="1" tabpos="1">
-		<Cursor position="3417" topLine="82" />
+	<File name="Makefile" open="1" top="0" tabpos="1">
+		<Cursor position="3572" topLine="87" />
 	</File>
 	<File name="include\ditto.h" open="0" top="0" tabpos="6">
 		<Cursor position="185" topLine="0" />
@@ -17,10 +17,10 @@
 		<Cursor position="331" topLine="0" />
 	</File>
 	<File name="include\loaders\fs_loader.h" open="0" top="0" tabpos="9">
-		<Cursor position="694" topLine="4" />
+		<Cursor position="657" topLine="4" />
 	</File>
 	<File name="include\profile_enforcer.h" open="1" top="0" tabpos="7">
-		<Cursor position="1523" topLine="21" />
+		<Cursor position="376" topLine="9" />
 	</File>
 	<File name="include\profile_loader.h" open="1" top="0" tabpos="6">
 		<Cursor position="1205" topLine="0" />
@@ -43,8 +43,8 @@
 	<File name="src\intercept_example.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="110" topLine="0" />
 	</File>
-	<File name="src\loaders\fs_loader.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="2327" topLine="34" />
+	<File name="src\loaders\fs_loader.cpp" open="1" top="1" tabpos="8">
+		<Cursor position="2513" topLine="42" />
 	</File>
 	<File name="src\profile_enforcer.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="309" topLine="0" />

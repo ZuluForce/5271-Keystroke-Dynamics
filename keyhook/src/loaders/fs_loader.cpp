@@ -33,9 +33,9 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 		// Should throw some sort of exception here
 		std::cerr << "Failed to open profile file" << std::endl;
 		std::cerr << "Error: " << strerror(errno) << std::endl;
-		std::cerr << "Trying with .fs_kdprof extension" << std::endl;
+		std::cerr << "Trying with .ditto extension" << std::endl;
 
-		std::string name = id.getProfileName() + ".fs_kdprof";
+		std::string name = id.getProfileName() + ".ditto";
 		input = fopen(name.c_str(), "rb");
 		if (input == NULL) {
 			std::cerr << "Failed to open again" << std::endl;
@@ -43,7 +43,9 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 		}
 	}
 
-	size_t read, numRead = 0;
+	size_t read, numFly, numPress, numRead;
+	read = numFly = numPress = numRead = 0;
+
 	size_t unitSize = sizeof(FSProfileUnit);
 	FSProfileUnit unit;
 
@@ -67,8 +69,12 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 
 		if (unit.time_type == FLY_TIME) {
 			profile.addFlyTime(from_index, to_index, unit.time_in_ms * MICRO_IN_MILLI);
+			std::cout << "from: " << from_index << std::endl;
+			std::cout << "to: " << to_index << std::endl;
+			++numFly;
 		} else if (unit.time_type == PRESS_TIME) {
 			profile.addPressTime(from_index, unit.time_in_ms * MICRO_IN_MILLI);
+			++numPress;
 		} else {
 			std::cerr << "Unknown time tpye in the loaded FSProfileUnit: " << unit.time_type << std::endl;
 			fclose(input);
@@ -79,6 +85,9 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 	}
 
 	std::cout << "\tFSProfileLoader finished loading" << std::endl;
+	std::cout << "\tTotal Read: " << numRead << std::endl;
+	std::cout << "\tNum Fly Times: " << numFly << std::endl;
+	std::cout << "\tNum Press Times: " << numPress << std::endl;
 	fclose(input);
 	return 0;
 }

@@ -40,15 +40,29 @@ class FSProfileStruct(Structure):
     def setToKey(self, val):
         self.to_key = val
 
+def sizeofStruct(struct):
+    return sizeof(struct)
+
+def buildStructFromBytes(struct, encoded):
+    """
+    Build a struct from the encoded data given. The <struct> parameter should
+    be an instance of the Structure class you want to fill.
+    """
+    bytefile = BytesIO(encoded)
+    bytefile.readinto(struct)
+    return struct
 
 def getStructBytes(struct):
     if not isinstance(struct, Structure):
         raise "getStructBytes: struct is not a instance of ctypes.Structure"
         
     bytefile = BytesIO()
-    bytefile.write(unit)
+    bytefile.write(struct)
 
     return bytefile.getvalue()
+
+def writeStruct(file, struct):
+    file.write(getStructBytes(struct))
 
 if __name__ == '__main__':
     unit = FSProfileStruct()
