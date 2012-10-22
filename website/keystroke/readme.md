@@ -1,33 +1,16 @@
-# Minnesota Web Development
-## mnwd-website
+# Keystroke Dynamics Data Collection
 
-This is the repository for hacking on the MNWD website, usually located at http://mnwd.org.
+### Data Collected
+* For All (k1, k2): Fly Times k1 –> k2
+* For all (k): Dwell Times
 
-To get up and running, simply drop this in a live docroot and go.  The site is entirely static at the moment.
-
-### We are looking for contributions related to:
-* Resources page
-* Basic styles (no actual branding or themeing)
-* Fixing of trivial errors
-* Other cool things that you might develop and send to us in a pull request
-
-### Sammple Apache config
+### Sample Apache + PHP Configuration
 ```
 <VirtualHost *:80>
-    DocumentRoot "/Sites/mnwd/public"
-    ServerName mnwd.org
+    DocumentRoot "/Sites/keystroke/public"
+    ServerName keystroke.org
+    ServerAlias test.keystroke.org
+
+    php_value include_path "/Sites/keystroke"
 </VirtualHost>
-```
-
-### Sample NGiNX config
-```
-server {
-    listen       *:80;
-    server_name  mnwd.org www.mnwd.org;
-
-    location / {
-        root   /www/mnwd.org/public;
-        index  index.html index.htm;
-    }
-}
 ```
