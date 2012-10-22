@@ -2,7 +2,7 @@
 
 ### Data Collected
 * For All (k1, k2): Fly Times k1 –> k2
-* For all (k): Dwell Times
+* For All (k): Dwell Times k
 
 ### Sample Apache + PHP Configuration
 ```
