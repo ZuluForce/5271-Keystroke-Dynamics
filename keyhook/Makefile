@@ -93,12 +93,12 @@ gen_fs_loader: gen_fs_loader_profile.cpp fs_loader.h
 
 
 $(PYTHON_OUT_LIB)/%.so:
-	$(CC) -shared $(PYTHON_OBJ)/$*.o \
+	$(CC) -shared $(PYTHON_OBJ)/$*.o -lboost_system \
 	-L$(BOOST_LIB) -l$(PYTHON_LIB) -L/usr/lib/python$(PYTHON_VER)/config \
 	-lpython$(PYTHON_VER) -o $@
 
 $(PYTHON_OBJ)/$(PY_SCANCODES).o: python_scancodes.cpp profile_enforcer.h
-	$(CC) -fPIC -I$(PYTHON) -I$(INCDIR) -I$(BOOST_INC) -c $< -o $@
+	$(CC) -fPIC -I$(PYTHON) -I$(INCDIR) -I$(BOOST_INC) -c $< -o $@ -std=c++0x
 
 python_scan_codes: $(PYTHON_OBJ)/$(PY_SCANCODES).o $(PYTHON_OUT_LIB)/$(PY_SCANCODES).so
 	@echo "Finished building scancodes enum for python\n"
@@ -109,9 +109,13 @@ all_python: python_scan_codes
 
 all_python_win:
 	make PYTHON_VER=$(PYTHON_VER_WIN) PYTHON=C:\Python$(PYTHON_VER_WIN)\include \
-	SYS_LIBDIR=C:\Python$(PYTHON_VER_WIN)\DLLs CPY_CMC=COPY ROOT_CPY_CMD=COPY \
-	BOOST_INC=C:\MinGW\include BOOST_LIB=C:\MinGW\lib PYTHON_LIB=boost_python3 \
-	EXPORT_FLAG= all_python
+	SYS_LIBDIR=C:\Python$(PYTHON_VER_WIN)\DLLs BOOST_INC=C:\MinGW\include \
+	BOOST_LIB=C:\MinGW\lib PYTHON_LIB=boost_python3 EXPORT_FLAG= all_python
+
+python/fs_loader_sizes: print_fsloader_sizes.cpp fs_loader.h
+	$(CC) -I$(INCDIR) $(CFLAGS) $^ -o $@ $(LFLAGS)
+
+all_ditto_python: python/fs_loader_sizes
 
 .PHONY: clean
 .PHONY: clean_python

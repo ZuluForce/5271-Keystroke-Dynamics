@@ -202,7 +202,6 @@ void BasicProfileEnforcer::addToQueue(std::queue<PendingStroke*>& q,PendingStrok
 	m.unlock();
 
 	sem.notify();
-	std::cout << "addToQueue: added stroke to queue" << std::endl;
 }
 
 PendingStroke* BasicProfileEnforcer::getFromQueue(std::queue<PendingStroke*>& q, boost::mutex& m, semaphore& sem) {
@@ -213,8 +212,6 @@ PendingStroke* BasicProfileEnforcer::getFromQueue(std::queue<PendingStroke*>& q,
 	q.pop();
 
 	m.unlock();
-
-	std::cout << "getFromQueue: retrieved stroke from queue" << std::endl;
 
 	return stroke;
 }

@@ -51,6 +51,8 @@ enum ScanCode {
     SCANCODE_M		= 0x32, // 50
     SCANCODE_RSHFT	= 0x36, // 54
     SCANCODE_SPACE	= 0x39, // 57
+
+    SCANCODE_NONE	= 0xFF, // 255 - Don't use this in loaded profiles
 };
 
 // Be sure to update if we map new scancodes

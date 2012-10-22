@@ -25,10 +25,10 @@ enum FSProfileTimeType {
 
 struct FSProfileUnit {
 	FSProfileTimeType time_type;
-	unsigned int time_in_ms;
+	uint32_t time_in_ms;
 	ScanCode from_key;
 	ScanCode to_key;
-};
+} __attribute__((packed));
 
 class FSProfileLoader: public DittoProfileLoader {
 public:
