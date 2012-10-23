@@ -69,8 +69,6 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 
 		if (unit.time_type == FLY_TIME) {
 			profile.addFlyTime(from_index, to_index, unit.time_in_ms * MICRO_IN_MILLI);
-			std::cout << "from: " << from_index << std::endl;
-			std::cout << "to: " << to_index << std::endl;
 			++numFly;
 		} else if (unit.time_type == PRESS_TIME) {
 			profile.addPressTime(from_index, unit.time_in_ms * MICRO_IN_MILLI);

@@ -2,13 +2,13 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="ditto" />
 	<File name="Makefile" open="1" top="0" tabpos="1">
-		<Cursor position="3572" topLine="87" />
+		<Cursor position="3572" topLine="84" />
 	</File>
 	<File name="include\ditto.h" open="0" top="0" tabpos="6">
 		<Cursor position="185" topLine="0" />
 	</File>
-	<File name="include\enforcers\basic_enforcer.h" open="1" top="0" tabpos="4">
-		<Cursor position="626" topLine="9" />
+	<File name="include\enforcers\basic_enforcer.h" open="1" top="0" tabpos="5">
+		<Cursor position="537" topLine="15" />
 	</File>
 	<File name="include\interception.h" open="0" top="0" tabpos="0">
 		<Cursor position="5773" topLine="123" />
@@ -19,14 +19,14 @@
 	<File name="include\loaders\fs_loader.h" open="0" top="0" tabpos="9">
 		<Cursor position="657" topLine="4" />
 	</File>
-	<File name="include\profile_enforcer.h" open="1" top="0" tabpos="7">
-		<Cursor position="376" topLine="9" />
+	<File name="include\profile_enforcer.h" open="0" top="0" tabpos="7">
+		<Cursor position="1290" topLine="18" />
 	</File>
-	<File name="include\profile_loader.h" open="1" top="0" tabpos="6">
+	<File name="include\profile_loader.h" open="0" top="0" tabpos="6">
 		<Cursor position="1205" topLine="0" />
 	</File>
-	<File name="include\util\timer.h" open="1" top="0" tabpos="5">
-		<Cursor position="1932" topLine="50" />
+	<File name="include\util\timer.h" open="1" top="0" tabpos="3">
+		<Cursor position="1355" topLine="36" />
 	</File>
 	<File name="src\ditto.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="656" topLine="6" />
@@ -34,17 +34,17 @@
 	<File name="src\ditto_capture.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="src\enforcers\basic_enforcer.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="6319" topLine="152" />
+	<File name="src\enforcers\basic_enforcer.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="3355" topLine="81" />
 	</File>
-	<File name="src\generate\gen_fs_loader_profile.cpp" open="1" top="0" tabpos="3">
+	<File name="src\generate\gen_fs_loader_profile.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="1074" topLine="54" />
 	</File>
 	<File name="src\intercept_example.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="110" topLine="0" />
 	</File>
-	<File name="src\loaders\fs_loader.cpp" open="1" top="1" tabpos="8">
-		<Cursor position="2513" topLine="42" />
+	<File name="src\loaders\fs_loader.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="2421" topLine="50" />
 	</File>
 	<File name="src\profile_enforcer.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="309" topLine="0" />
@@ -58,7 +58,7 @@
 	<File name="src\util\semaphore.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="376" topLine="0" />
 	</File>
-	<File name="src\util\timer.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="2439" topLine="60" />
+	<File name="src\util\timer.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="1005" topLine="24" />
 	</File>
 </CodeBlocks_layout_file>

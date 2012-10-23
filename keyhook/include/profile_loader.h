@@ -10,6 +10,8 @@
 // Since ditto will likely have to support loading profiles from multiple
 // places I am creating an abstract base class as an interface
 
+typedef uint32_t KDProfileKey;
+
 class KDProfile {
 private:
 	/* A matrix of fly times where the row specifies the 'from' key,

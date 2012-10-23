@@ -21,16 +21,18 @@ struct PendingStroke {
 };
 
 struct KeyDownHist {
-	// When the key down event was received
-	ChronoClockPoint kd_received;
-
-	// How long we were specified to wait before sending
-	ChronoMicroDuration kd_wait;
+	// When the key down event will be sent
+	ChronoClockPoint kd_dispatch_time;
 };
 
 class BasicProfileEnforcer: public DittoProfileEnforcer {
 private:
+	// This is used to account for clock drift. This becomes more
+	// important when fly times get smaller
+	static const ChronoMicroDuration ditto_overhead;
+
 	boost::mutex dq_mutex, du_mutex, dd_mutex;
+	boost::mutex interception_lock;
 
 	/* dq_Sem - dispatchQueue semaphore
 	 * du_sem - dispatchUp queue semaphore

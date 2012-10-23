@@ -54,7 +54,7 @@ public:
 	 * While the timer is still running check the current time. This is measured
 	 * from the time start() was called.
 	 */
-	int64_t checkTime();
+	ChronoMicroDuration checkTime();
 
 	/**
 	 * Basic lap functionality like a real stopwatch. Gives you the time difference since

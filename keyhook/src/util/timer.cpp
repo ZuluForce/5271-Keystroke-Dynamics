@@ -37,12 +37,12 @@ int64_t ChronoStopwatch::stop() {
 	return this->getDuration(startTime, endTime).count();
 }
 
-int64_t ChronoStopwatch::checkTime() {
+ChronoMicroDuration ChronoStopwatch::checkTime() {
 	if (!running)
-		return -1;
+		return ChronoMicroDuration(-1);
 
 	ChronoClock::time_point timeNow = ChronoClock::now();
-	return this->getDuration(startTime, timeNow).count();
+	return this->getDuration(startTime, timeNow);
 }
 
 int64_t ChronoStopwatch::lap() {
