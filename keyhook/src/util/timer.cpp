@@ -45,6 +45,10 @@ ChronoMicroDuration ChronoStopwatch::checkTime() {
 	return this->getDuration(startTime, timeNow);
 }
 
+ChronoClockPoint ChronoStopwatch::now() {
+	return ChronoClock::now();
+}
+
 int64_t ChronoStopwatch::lap() {
 	if (!running)
 		return -1;

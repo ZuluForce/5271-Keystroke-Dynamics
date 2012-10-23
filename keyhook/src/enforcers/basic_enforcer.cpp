@@ -8,182 +8,97 @@ BasicProfileEnforcer::BasicProfileEnforcer() {
 	return;
 }
 
-void BasicProfileEnforcer::dispatchDown() {
-	std::cout << "dispatchDown thread started\n" << std::endl;
 
-	PendingStroke* stroke;
-	int64_t sleeptime;
-	int64_t keydown_count = 0;
-	while (true) {
-		stroke = getFromQueue(dispatchDownQueue, dd_mutex, dd_sem);
-
-		sleeptime = stroke->wait_time.count();
-		std::cout << "vDOWNv Sleeping for " << sleeptime << " us" << std::endl;
-
-		// Sleep for the appropriate time
-		//auto boostPoint = ChronoStopwatch::toBoostTimePoint(stroke->release_time);
-		//boost::this_thread::sleep_until(boostPoint);
-		if (sleeptime > 0)
-			boost::this_thread::sleep(boost::posix_time::microseconds(sleeptime));
-
-		interception_lock.lock();
-		interception_send(context, device, (InterceptionStroke *) &(stroke->stroke), 1);
-		interception_lock.unlock();
-
-		++keydown_count;
-		std::cout << "keydown count: " << keydown_count << std::endl;
-		free(stroke);
-	}
-}
-
-void BasicProfileEnforcer::dispatchUp() {
-	std::cout << "dispatchUp thread started\n" << std::endl;
-
-	PendingStroke* stroke;
-	int64_t sleeptime;
-	int64_t keyup_count = 0;
-	while (true) {
-		stroke = getFromQueue(dispatchUpQueue, du_mutex, du_sem);
-
-		sleeptime = stroke->wait_time.count();
-		std::cout << "^UP^ Sleeping for " << sleeptime << " us" << std::endl;
-		// Sleep for the appropriate time
-		//auto boostPoint = ChronoStopwatch::toBoostTimePoint(stroke->release_time);
-		//boost::this_thread::sleep_until(boostPoint);
-		if (sleeptime > 0)
-			boost::this_thread::sleep(boost::posix_time::microseconds(sleeptime));
-
-		interception_lock.lock();
-		interception_send(context, device, (InterceptionStroke *) &(stroke->stroke), 1);
-		interception_lock.unlock();
-
-		++keyup_count;
-		std::cout << "keyup count: " << keyup_count << std::endl;
-		free(stroke);
-	}
-}
-
-void BasicProfileEnforcer::dispatchReceiver() {
+void BasicProfileEnforcer::dispatcher() {
 	std::cout << "\nBasicProfileEnforcer dispatchReceiver started\n" << std::endl;
-	boost::this_thread::disable_interruption di;
 
 	ChronoStopwatch watch = ChronoStopwatch();
 	PendingStroke* pStroke = NULL;
 	InterceptionKeyStroke stroke;
 
 	KeyDownHist kd_hist;
-	std::map<int, KeyDownHist>::iterator kd_hist_it;
+	std::map<KDProfileKey, KeyDownHist>::iterator kd_hist_it;
 
-	ChronoClockPoint lapPoint, nextDispatchPoint, nextUpDispatchPoint;
-	ChronoMicroDuration lapDuration, flyDuration, pressDuration, tempDuration;
+	ChronoClockPoint lapPoint, lastKeyDown;
+	lastKeyDown = ChronoClock::now();
+
+	ChronoMicroDuration lapDuration, flyTime, pressTime, sleepTime;
 	KDProfileKey current_key = SCANCODE_A;
-
-	// Create other dispatcher threads
-	boost::thread* dispatchUpThread =
-		new boost::thread(boost::bind(&BasicProfileEnforcer::dispatchUp, this));
-	boost::thread* dispatchDownThread =
-		new boost::thread(boost::bind(&BasicProfileEnforcer::dispatchDown, this));
 
 	bool firstStroke = true;
 
-	// We need to initialize this on the very first stroke but not after that
-	//bool nextDispatchInit = true;
 
-	nextDispatchPoint = ChronoClock::now();
-	nextUpDispatchPoint = nextDispatchPoint;
 	watch.start();
 	while (true) {
 		pStroke = this->getFromDispatch();
-		lapDuration = watch.lapDuration();
-
-		// Do once
-		//if (nextDispatchInit) {
-		//	nextDispatchPoint = ChronoClock::now();
-		//	nextDispatchInit = false;
-		//}
+		lapPoint = watch.now();
 
 		stroke = pStroke->stroke;
-		std::cout << "Recieved stroke: " << stroke.code <<  " (" << lapDuration.count() << " us)" << std::endl;
 		if (lapDuration.count() < 0) {
 			std::cerr << "The high precison timer has failed. Must exit." << std::endl;
 			exit(-1);
 		}
 
 		if (stroke.state == INTERCEPTION_KEY_DOWN) {
-			// Get the appropriate flight time
-			flyDuration = this->profileRef->getFlyTime(current_key, stroke.code);
-			lapPoint = watch.lastLapTotalTime();
+			flyTime = this->profileRef->getFlyTime(current_key, stroke.code);
+			sleepTime = lapPoint - lastKeyDown; // This gives us how long it has been since the last KD
+			sleepTime = flyTime - sleepTime; // How long we should sleep to satisfy the profile
 
-			std::cout << "Profile fly time: " << flyDuration.count() << " us" << std::endl;
-
-			if (lapPoint > nextDispatchPoint) {
-				// The previous key down stroke has been delivered
-
-				// Time since the last key down dispatch
-				tempDuration = lapPoint - nextDispatchPoint;
-
-				// How long we should wait
-				tempDuration = flyDuration - tempDuration;
-
-				// If we allow negative values here it will screw up the 'nextDispatchPoint', the time
-				// for the next key to be dispatched will continue to get further in the past
-				pStroke->wait_time = tempDuration.count() < 0 ? ChronoMicroDuration(0) : tempDuration;
-
-				nextDispatchPoint = ChronoClock::now() + pStroke->wait_time;
-			} else {
-				// If we get this stroke before the previous has been sent we should set the wait
-				// time to be the full fly time since it will be applied right after that key is
-				// delivered
-				pStroke->wait_time = flyDuration;
-
-				nextDispatchPoint += flyDuration;
+			if (sleepTime.count() > 0) {
+				boost::this_thread::sleep(boost::posix_time::microseconds(sleepTime.count()));
 			}
+			interception_send(context, device, (InterceptionStroke *) &(stroke), 1);
 
-			// Save this so we can do appropriate time calculations when the keyup comes in
-			kd_hist.kd_received = lapPoint;
-			kd_hist.kd_wait = pStroke->wait_time;
+			kd_hist.kd_dispatch_time = watch.now();
+			lastKeyDown = kd_hist.kd_dispatch_time;
 
-			dispatchDownHist[stroke.code] = kd_hist;
-
-			addToQueue(dispatchDownQueue, pStroke, dd_mutex, dd_sem);
-
-			// Reset the current key
 			current_key = stroke.code;
 
-			// Some very basic clock drift estimate. I am not even sure if this
-			// overhead is correct. If anything it is an underestimate of the actual overhead
-			nextDispatchPoint += BasicProfileEnforcer::ditto_overhead;
+			/* We check below if the key is already in the history because if the user
+			 * holds down a key we will receive multiple key down events but for the purpose
+			 * of measuring the press time we only want the first one.
+			 */
+			if (dispatchDownHist.count(current_key) == 0)
+				dispatchDownHist[current_key] = kd_hist;
 
+			free(pStroke);
+
+			std::cout << "<DOWN(" << stroke.code << ")> time: " << lastKeyDown.time_since_epoch().count() << std::endl;
 		} else if (stroke.state == INTERCEPTION_KEY_UP) {
+			if (firstStroke && stroke.code == SCANCODE_RTRN) {
+				firstStroke = false;
+
+				free(pStroke);
+				continue;
+			}
+
+			pressTime = this->profileRef->getPressTime(stroke.code);
 			kd_hist_it = dispatchDownHist.find(stroke.code);
 			if (kd_hist_it == dispatchDownHist.end()) {
-				if (firstStroke && stroke.code == SCANCODE_RTRN) {
-					std::cout << "Ignoring initiall return keyup" << std::endl;
-					free(pStroke);
-					continue;
-				}
-				std::cerr << "Ditto received a keyup event for which it doesn't have a keydown" << std::endl;
+				std::cerr << "Received key up stroke with no previous corresponding key down" << std::endl;
 				exit(-1);
 			}
+			// This holds the time the corresponding keydown was sent out
 			kd_hist = kd_hist_it->second;
-			pressDuration = this->profileRef->getPressTime(stroke.code);
-			lapPoint = watch.lastLapTotalTime();
 
-			// Find how much longer until the keydown is delivered
+			// Take the profile's press time and subtract the time since the keydown
+			sleepTime = pressTime - (lapPoint - kd_hist.kd_dispatch_time);
 
-			durationToKD =
-				ChronoStopwatch::getFutureTimePoint(kd_hist.kd_received, kd_hist.kd_wait) - lapPoint;
-			durationToKD = durationToKD + pressDuration;
+			if (sleepTime.count() > 0) {
+				boost::this_thread::sleep(boost::posix_time::microseconds(sleepTime.count()));
+			}
 
-			// We then add the profile presstime to the time in the future that the key down
-			// event will occur
-			pStroke->wait_time = durationToKD;
-
-			addToQueue(dispatchUpQueue, pStroke, du_mutex, du_sem);
+			interception_send(context, device, (InterceptionStroke *) &(stroke), 1);
 
 			dispatchDownHist.erase(kd_hist_it);
+			free(pStroke);
 
-			// We don't reset the current_key on keyup
+			lapPoint = watch.now();
+			std::cout << "<UP(" << stroke.code << ")> time: " << lapPoint.time_since_epoch().count() << std::endl;
+		} else {
+			std::cerr << "dispatcher received stroke for unknown state (UP/DOWN)" << std::endl;
+			exit(-1);
+			//continue;
 		}
 	}
 }
@@ -206,7 +121,7 @@ void BasicProfileEnforcer::enforce(KDProfile& profile) {
 
 	// Create dispatch thread
 	boost::thread* dispatchThread =
-		new boost::thread(boost::bind(&BasicProfileEnforcer::dispatchReceiver, this));
+		new boost::thread(boost::bind(&BasicProfileEnforcer::dispatcher, this));
 
 	// We want to catch ctrl+c so even if things break down the pipeline we can
 	// still close it
@@ -228,7 +143,7 @@ void BasicProfileEnforcer::enforce(KDProfile& profile) {
 			}
 		}
 
-		//std::cout << "Received Stroke: " << kstroke.code << std::endl;
+		std::cout << "Received Stroke: " << kstroke.code << std::endl;
 		tempPStroke = (PendingStroke*) malloc(sizeof(PendingStroke));
 
 		tempPStroke->stroke = kstroke;
@@ -238,26 +153,6 @@ void BasicProfileEnforcer::enforce(KDProfile& profile) {
 
 	// Cleanup
 	interception_destroy_context(context);
-}
-
-void BasicProfileEnforcer::addToQueue(std::queue<PendingStroke*>& q,PendingStroke* stroke,boost::mutex& m, semaphore& sem) {
-	m.lock();
-	q.push(stroke);
-	m.unlock();
-
-	sem.notify();
-}
-
-PendingStroke* BasicProfileEnforcer::getFromQueue(std::queue<PendingStroke*>& q, boost::mutex& m, semaphore& sem) {
-	sem.wait();
-	m.lock();
-
-	PendingStroke* stroke = q.front();
-	q.pop();
-
-	m.unlock();
-
-	return stroke;
 }
 
 void BasicProfileEnforcer::addToDispatch(PendingStroke* stroke) {

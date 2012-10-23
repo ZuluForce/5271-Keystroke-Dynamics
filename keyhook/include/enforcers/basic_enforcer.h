@@ -31,34 +31,24 @@ private:
 	// important when fly times get smaller
 	static const ChronoMicroDuration ditto_overhead;
 
-	boost::mutex dq_mutex, du_mutex, dd_mutex;
+	boost::mutex dq_mutex;
 	boost::mutex interception_lock;
 
 	/* dq_Sem - dispatchQueue semaphore
 	 * du_sem - dispatchUp queue semaphore
 	 * dd_sem - dispatchDown queue semaphore
 	 */
-	semaphore dq_sem, du_sem, dd_sem;
+	semaphore dq_sem;
 	std::queue<PendingStroke*> dispatchQueue;
 	KDProfile* profileRef;
 
-	// For the dispatchUp and dispatchDown threads repectively
-	std::queue<PendingStroke*> dispatchUpQueue;
-	std::queue<PendingStroke*> dispatchDownQueue;
-
 	// This is necessary for the dispathReceiver to calcualte times
 	// for the appropriate key up events
-	std::map<int, KeyDownHist> dispatchDownHist;
+	std::map<KDProfileKey, KeyDownHist> dispatchDownHist;
 
-	void dispatchUp();
-	void dispatchDown();
-	void dispatchReceiver();
+	void dispatcher();
 	void addToDispatch(PendingStroke*);
 	PendingStroke* getFromDispatch();
-
-	// Generic methods for any queue. Could get rid of the other dispatchQueue methods
-	void addToQueue(std::queue<PendingStroke*>&,PendingStroke*,boost::mutex&,semaphore&);
-	PendingStroke* getFromQueue(std::queue<PendingStroke*>&, boost::mutex&, semaphore&);
 
 	// Some shared state for the capture and dispatch
 	InterceptionContext context;

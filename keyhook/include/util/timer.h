@@ -56,6 +56,8 @@ public:
 	 */
 	ChronoMicroDuration checkTime();
 
+	ChronoClockPoint now();
+
 	/**
 	 * Basic lap functionality like a real stopwatch. Gives you the time difference since
 	 * the last time you called lap or start if it is the first time you have called it since
