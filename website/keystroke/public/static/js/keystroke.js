@@ -72,17 +72,90 @@ $(document).ready(function() {
 		}
 	});
 
-	printData = function() {
-		$("#keystroke-report").append("<h3>Fly Times</h3>");
-		for (k1 in fly_times) {
-			for (k2 in fly_times[k1]) {
-				$("#keystroke-report").append("<strong>"+ids_to_keys[k1]+"</strong>&rarr;"+ids_to_keys[k2]+" ["+fly_times[k1][k2]+"]<br/>");
-			}
-			$("#keystroke-report").append("<br/>");
+
+	// Extend array capabilities:
+	Array.prototype.sum = function() {
+		var sum = 0;
+		for (var i=0; i<this.length; i++) {
+			sum += this[i];
 		}
-		$("#keystroke-report").append("<h3>Keypress Times</h3>");
-		for (k in press_times) {
-			$("#keystroke-report").append("<strong>"+ids_to_keys[k]+"</strong> ["+press_times[k]+"]<br/>");
+		return sum;
+	};
+
+	Array.prototype.mean = function() {
+		var sum = this.sum();
+		return sum/this.length;
+	};
+
+	Array.prototype.variance = function() {
+		var mean = this.mean();
+		var sum_of_square_differences = 0;
+		for (var i=0; i<this.length; i++) {
+			sum_of_square_differences = sum_of_square_differences + (mean-this[i]) * (mean-this[i]);
+		}
+		if (this.length-1 > 0) {
+			return sum_of_square_differences/(this.length-1);
+		}
+		else {
+			return 0;
 		}
 	};
+
+	Array.prototype.standardDeviation = function() {
+		return Math.sqrt(this.variance());
+	};
+	Array.prototype.stdev = Array.prototype.standardDeviation;
+
+	refreshData = function() {
+		press_times = {};
+		fly_times = {};
+		$("#fields > input").val("");
+		$("#keystroke-report").html("");
+	};
+
+	printJSON = function() {
+		$("#keystroke-report").html("");
+		var text = "<h3>Fly Times</h3>";
+		text += "<p>"+JSON.stringify(fly_times)+"</p>";
+		text += "<h3>Press Times</h3>";
+		text += "<p>"+JSON.stringify(press_times)+"</p>";
+
+		$("#keystroke-report").append(text);
+	};
+
+	printData = function() {
+		$("#keystroke-report").html("");
+		var text = "<h3>Fly Times</h3>";
+		text += "<dl class=\"dl-horizontal\">";
+		for (k1 in fly_times) {
+			for (k2 in fly_times[k1]) {
+				text += "<dt>"+ids_to_keys[k1]+"&rarr;"+ids_to_keys[k2]+"</dt> <dd>(&mu;, &sigma;): ("+fly_times[k1][k2].mean().toFixed(0)+", "+fly_times[k1][k2].stdev().toFixed(2)+/*"<br/><strong>[</strong>"+fly_times[k1][k2]+"<strong>]</strong>*/")</dd>";
+			}
+		}
+		text += "</dl>";
+		text += "<h3>Press Times</h3>";
+		text += "<dl class=\"dl-horizontal\">";
+		for (k in press_times) {
+			text += "<dt>"+ids_to_keys[k]+"</dt> <dd>(&mu;, &sigma;): ("+press_times[k].mean().toFixed(0)+", "+press_times[k].stdev().toFixed(2)+/*"</strong> ["+press_times[k]+"]*/")</dd>";
+		}
+		text += "</dl>";
+		$("#keystroke-report").append(text);
+	};
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
