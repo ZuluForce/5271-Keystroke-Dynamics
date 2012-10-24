@@ -17,17 +17,40 @@ namespace masada
         public Form1()
         {
             InitializeComponent();
+            passwordTextBox.Text = "";
+            passwordTextBox.PasswordChar = '*';
         }
 
         private void logingButton_Click(object sender, EventArgs e)
         {
             if (checkUser(usernameTextBox.Text, passwordTextBox.Text))
             {
-                MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
+               // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
+                Form2 form2 = new Form2();
+                form2.RefToForm1 = this;
+                form2.Show();
+                this.Hide();
             }
             else
             {
-                MessageBox.Show("Failed to Login", "Success", MessageBoxButtons.OK);
+                MessageBox.Show("Failed to Login", "Nope...", MessageBoxButtons.OK);
+            }
+
+        }
+
+        private void logingButton_Click()
+        {
+            if (checkUser(usernameTextBox.Text, passwordTextBox.Text))
+            {
+                // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
+                Form2 form2 = new Form2();
+                form2.RefToForm1 = this;
+                form2.Show();
+                this.Hide();
+            }
+            else
+            {
+                MessageBox.Show("Failed to Login", "Nope...", MessageBoxButtons.OK);
             }
 
         }
@@ -122,6 +145,16 @@ namespace masada
             {
                 sw.WriteLine(_write);
             }
+        }
+
+        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            
+             if (e.KeyChar == (char) 13)
+            {
+                logingButton_Click();
+            }
+            
         }
  
     }
