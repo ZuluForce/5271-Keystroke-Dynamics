@@ -7,3 +7,4 @@ C:\Users\Ethan\Desktop\5271\masada\masada\masada\obj\Debug\masada.Properties.Res
 C:\Users\Ethan\Desktop\5271\masada\masada\masada\obj\Debug\masada.csproj.GenerateResource.Cache
 C:\Users\Ethan\Desktop\5271\masada\masada\masada\obj\Debug\masada.exe
 C:\Users\Ethan\Desktop\5271\masada\masada\masada\obj\Debug\masada.pdb
+C:\Users\Ethan\Desktop\5271\masada\masada\masada\obj\Debug\masada.Form2.resources

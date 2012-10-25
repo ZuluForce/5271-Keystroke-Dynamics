@@ -49,6 +49,7 @@
             this.passwordTextBox.Name = "passwordTextBox";
             this.passwordTextBox.Size = new System.Drawing.Size(133, 20);
             this.passwordTextBox.TabIndex = 1;
+            this.passwordTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Form1_KeyPress);
             // 
             // logingButton
             // 
@@ -98,6 +99,7 @@
             this.Controls.Add(this.passwordTextBox);
             this.Controls.Add(this.usernameTextBox);
             this.Name = "Form1";
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Form1_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
 
