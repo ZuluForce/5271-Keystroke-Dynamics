@@ -5,13 +5,13 @@
 # so too does this map.
 JSCodeToDitto = {
     8  : 0x0E,  # backspace
-    
+
     13 : 0x1C,  # return
 
     16 : 0x2A,  # left shift (ditto distinguishes left and right but not js)
 
     32 : 0x39,  # space
-    
+
     48 : 0x0B,  # 0
     49 : 0x02,  # 1
     50 : 0x03,  # 2
@@ -54,13 +54,13 @@ JSCodeToDitto = {
 
 DittoSCToChar = {
     0x0E: "backspace",
-    
+
     0x1C: "return",
 
     0x2A: "lShift",
 
     0x39: "space",
-    
+
     0x0B: "0",
     0x02: "1",
     0x03: "2",

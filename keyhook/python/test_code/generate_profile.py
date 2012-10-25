@@ -1,6 +1,6 @@
 import sys
-from ScanCodeMaps import *
-from pyDittoTypes import *
+from mappings.scan_code_maps import *
+from ditto_types import *
 
 if __name__ == '__main__':
     profile = open("pySample.ditto", "wb")

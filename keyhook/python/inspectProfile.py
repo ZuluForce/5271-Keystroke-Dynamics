@@ -1,12 +1,12 @@
 import sys
-from ScanCodeMaps import *
-from pyDittoTypes import *
+from mappings.scan_code_maps import *
+from ditto_types import *
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: {} [profile]".format(sys.argv[0]))
         sys.exit(1)
-    
+
     unitSize = sizeofStruct(FSProfileStruct)
 
     with open(sys.argv[1], "rb") as profile:
@@ -21,4 +21,4 @@ if __name__ == '__main__':
                 print("!! ---- Unrecognized FSProfileTimeType ( {} ) ---- !!".format(struct.time_type))
 
             sBytes = profile.read(unitSize)
-        
+

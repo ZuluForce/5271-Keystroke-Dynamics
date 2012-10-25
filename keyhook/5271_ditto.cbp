@@ -9,8 +9,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin\Debug\5271_ditto" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Debug\" />
+				<Option output="bin/Debug/5271_ditto" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -18,8 +18,8 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin\5271_ditto" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\" />
+				<Option output="bin/5271_ditto" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -30,7 +30,7 @@
 				</Linker>
 			</Target>
 			<Target title="ditto">
-				<Option output="bin\ditto" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/ditto" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -45,7 +45,7 @@
 				</MakeCommands>
 			</Target>
 			<Target title="gen_fs_loader">
-				<Option output="bin\generators\gen_fs_loader" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/generators/gen_fs_loader" prefix_auto="1" extension_auto="1" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<MakeCommands>
@@ -65,110 +65,105 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="include\ditto.h">
+		<Unit filename="include/ditto.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="include\enforcers\basic_enforcer.h">
+		<Unit filename="include/enforcers/basic_enforcer.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="include\interception.h">
+		<Unit filename="include/interception.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="include\known_ploaders.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="ditto" />
-		</Unit>
-		<Unit filename="include\loaders\fs_loader.h">
+		<Unit filename="include/known_ploaders.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="include\profile_enforcer.h">
+		<Unit filename="include/loaders/fs_loader.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="include\profile_loader.h">
+		<Unit filename="include/profile_enforcer.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="include\util\semaphore.h" />
-		<Unit filename="include\util\timer.h">
+		<Unit filename="include/profile_loader.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="include\utils.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src\ditto.cpp">
+		<Unit filename="include/util/semaphore.h" />
+		<Unit filename="include/util/timer.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="src\ditto_capture.cpp">
+		<Unit filename="include/utils.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="src\enforcers\basic_enforcer.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="ditto" />
-		</Unit>
-		<Unit filename="src\generate\gen_fs_loader_profile.cpp">
+		<Unit filename="src/ditto.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="src\intercept_example.cpp">
+		<Unit filename="src/ditto_capture.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="src\known_ploaders.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="ditto" />
-		</Unit>
-		<Unit filename="src\loaders\fs_loader.cpp">
+		<Unit filename="src/enforcers/basic_enforcer.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="src\profile_enforcer.cpp">
+		<Unit filename="src/generate/gen_fs_loader_profile.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="src\profile_loader.cpp">
+		<Unit filename="src/intercept_example.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/known_ploaders.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="src\python\python_scancodes.cpp">
+		<Unit filename="src/loaders/fs_loader.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="src\util\print_fsloader_sizes.cpp">
+		<Unit filename="src/profile_enforcer.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="src\util\semaphore.cpp" />
-		<Unit filename="src\util\timer.cpp">
+		<Unit filename="src/profile_loader.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="ditto" />
 		</Unit>
-		<Unit filename="src\utils.c">
+		<Unit filename="src/python/python_scancodes.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="ditto" />
+		</Unit>
+		<Unit filename="src/util/semaphore.cpp" />
+		<Unit filename="src/util/timer.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="ditto" />
+		</Unit>
+		<Unit filename="src/utils.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
