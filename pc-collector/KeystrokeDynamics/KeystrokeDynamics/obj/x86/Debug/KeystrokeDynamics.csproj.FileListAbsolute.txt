@@ -18,5 +18,3 @@ C:\Users\Dylan\Dropbox\workspace\pcdev\Visual Studio 2010\Projects\KeystrokeDyna
 C:\Users\Dylan\Dropbox\workspace\pcdev\Visual Studio 2010\Projects\KeystrokeDynamics\KeystrokeDynamics\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\Users\Dylan\Dropbox\workspace\Visual Studio 2010\Projects\KeystrokeDynamics\KeystrokeDynamics\obj\x86\Debug\KeystrokeDynamics.exe
 C:\Users\Dylan\Dropbox\workspace\Visual Studio 2010\Projects\KeystrokeDynamics\KeystrokeDynamics\obj\x86\Debug\KeystrokeDynamics.pdb
-C:\Users\Dylan\Dropbox\workspace\pcdev\CSci-5271-Keystroke-Dynamics\pc-collector\KeystrokeDynamics\KeystrokeDynamics\obj\x86\Debug\KeystrokeDynamics.exe
-C:\Users\Dylan\Dropbox\workspace\pcdev\CSci-5271-Keystroke-Dynamics\pc-collector\KeystrokeDynamics\KeystrokeDynamics\obj\x86\Debug\KeystrokeDynamics.pdb

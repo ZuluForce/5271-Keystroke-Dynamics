@@ -72,19 +72,21 @@ namespace KeystrokeDynamics
         private void button3_Click(object sender, EventArgs e)
         {
             timer1.Stop();
-            string pathname = "C:\\Users\\" + Environment.UserName + "\\test.txt";
+            string pathname = "C:\\Users\\" + Environment.UserName + "\\keyData.txt";
             System.IO.StreamWriter file = new System.IO.StreamWriter(pathname);
             file.WriteLine("{");
             foreach (keyRecord key in records) {
-                file.WriteLine("\t\"key\": \"" + key.Key + "\",");
-                file.WriteLine("\t\"keyDown\": \"" + key.DownTime + "\",");
+                file.WriteLine("\t{");
+                file.WriteLine("\t\t\"key\": \"" + key.Key + "\",");
+                file.WriteLine("\t\t\"keyDown\": \"" + key.DownTime + "\",");
+                file.WriteLine("\t\t\"keyUp\": \"" + key.UpTime + "\"");
                 if (key.Equals(records.Last()))
                 {
-                    file.WriteLine("\t\"keyUp\": \"" + key.UpTime + "\"");
+                    file.WriteLine("\t}");
                 }
                 else
                 {
-                    file.WriteLine("\t\"keyUp\": \"" + key.UpTime + "\",");
+                    file.WriteLine("\t},");
                 }
                 file.WriteLine();
             }
