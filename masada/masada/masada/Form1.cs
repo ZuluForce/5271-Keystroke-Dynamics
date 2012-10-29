@@ -132,6 +132,14 @@ namespace masada
 
         private string[] openLoginFile()
         {
+            if ( !File.Exists(Directory.GetCurrentDirectory() + "\\login.txt") )
+            {
+                FileStream fs = File.Create(Directory.GetCurrentDirectory() + "\\login.txt");
+                fs.Close();
+                StreamWriter sw = File.AppendText(Directory.GetCurrentDirectory() + "\\login.txt");
+                sw.WriteLine("admin:123456");
+                sw.Close();
+            }
             string text = System.IO.File.ReadAllText(Directory.GetCurrentDirectory() + "\\login.txt");
             string[] lines = text.Split('\r');
             return lines;
