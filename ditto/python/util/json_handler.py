@@ -4,9 +4,12 @@ except ImportError: import json
 def load_json(filename):
     with open(filename, "r") as f:
         json_data = f.read()
-        decoded_json = json.loads(json_data)
+        decoded_json = json_to_object(json_data)
         return decoded_json
 
+
+def json_to_object(data):
+    return json.loads(data)
 
 def write_json(data, fd=None, filename=None):
     """Write the provided json out to a file. If a fd (file descriptor), which in
