@@ -8,7 +8,7 @@ import db.queries as dbq
 from util.json_handler import json_to_object, write_json
 
 def startReduction(outdir):
-    records = dbq.getAllCompleted(name="Brian Test")
+    records = dbq.getAllCompleted(name="Andrew Helgeson")
     if records is None:
         print("Failed to retrieve records from database")
         return
