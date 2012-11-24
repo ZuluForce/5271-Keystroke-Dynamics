@@ -30,16 +30,18 @@ class FixedPartitioner(AbstractPartitioner):
                 # a profile that has the same WPM but less variance in times
                 if userWPM < currentPartitionWPM:
                     self.setPartitionProfile(partition_profiles, profiles[user], partition)
+                    partition_profiles[partition]['source'] = user
             else:
                 # This is the first user encountered for this partition so just
                 # add their data as the partition's profile
                 self.setPartitionProfile(partition_profiles, profiles[user], partition)
+                partition_profiles[partition]['source'] = user
                 
         return (partition_profiles, user_to_partition)
             
     
     def getPartitionNumFromWPM(self, wpm):
-        partition = (wpm % self.partionSize) + 1
+        partition = int((wpm / self.partionSize) + 1)
         return max(partition, self.lowestPartitionNum)
 
 
@@ -53,3 +55,4 @@ class FixedPartitioner(AbstractPartitioner):
 
         partitionDict[number]['fly_times'] = profile['text']['fly_times']
         partitionDict[number]['press_times'] = profile['text']['press_times']
+        partitionDict[number]['wpm'] = profile['wpm']

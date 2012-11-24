@@ -56,7 +56,6 @@ def loadProfiles(*filepaths):
 
     for path in filepaths:
         fname = os.path.basename(path)
-        saved_fname = fname
 
         # Load the profile's json data
         try:
@@ -130,3 +129,6 @@ if __name__ == '__main__':
     for pnum, profile in partitions.items():
         fname = os.path.join(outdir, str(pnum) + ".json")
         js.write_json(profile, filename=fname)
+        
+    user_map = os.path.join(outdir, 'user_map.json')
+    js.write_json(user_to_partition, filename=user_map)

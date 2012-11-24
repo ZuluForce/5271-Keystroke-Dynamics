@@ -1,5 +1,6 @@
 import re
 import sys
+import argparse
 
 from util.json_handler import load_json
 from mappings.scan_code_maps import *
@@ -85,14 +86,20 @@ def json_to_ditto(in_profile, out_profile):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: {} [profile prefix]+".format(sys.argv[0]))
-        print("Ex| andrewh_reduced.json; call '{} andrewh_reduced'".format(sys.argv[0]))
-        print("\tThis will output a profile called andrewh_reduced.ditto")
+    parser = argparse.ArgumentParser(description="Convet a set of json profiles to ditto binary profiles")
+    parser.add_argument('profiles', metavar='P', type=str, nargs='+',
+            help='profiles to convert')
+    parser.add_argument('-o','--outdir', type=str, required=True, help="Output directory for partitioning information")
+    
+    args = parser.parse_args()
 
-    for prefix in sys.argv[1:]:
-        in_profile = "{}.json".format(prefix)
-        out_profile = "{}.ditto".format(prefix)
+    for profile in args.profiles:
+        if 'user_map.json' in profile:
+            print("Ignoring 'user_map.json'")
+            continue
 
-        print("json_to_ditto({}, {})".format(in_profile,out_profile))
-        json_to_ditto(in_profile, out_profile)
+        # Take the basename for the profile to make the ditto profile name
+        out_profile = "{}.ditto".format(profile.rsplit('.',1)[0])
+
+        print("json_to_ditto({}, {})".format(profile, out_profile))
+        json_to_ditto(profile, out_profile)
