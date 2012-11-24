@@ -8,7 +8,7 @@ import db.queries as dbq
 from util.json_handler import json_to_object, write_json
 
 def startReduction(outdir):
-    records = dbq.getAllCompleted(name="Andrew Helgeson")
+    records = dbq.getAllCompleted()
     if records is None:
         print("Failed to retrieve records from database")
         return
@@ -20,11 +20,10 @@ def startReduction(outdir):
         data = json_to_object(record.data)
         data = rdc.std_reduce(data)
 
-        if record.name is None or record.name == "":
-            record.name = "noname"
-
-        out_file = "{}_{}_reduced.json".format(record.name, record.email)
+        out_file = "{}_reduced.json".format(record.email)
         out_file = os.path.join(outdir, out_file)
+        out_file = out_file.replace(' ', '_').replace('@', '')
+        
         print("name:{} email:{} -> {}".format(record.name, record.email, out_file))
 
 

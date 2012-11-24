@@ -23,7 +23,7 @@ def write_json(data, fd=None, filename=None):
         return
 
     if filename is not None:
-        with open(filename) as f:
+        with open(filename, "w+") as f:
             f.write(json.dumps(data))
 
         return

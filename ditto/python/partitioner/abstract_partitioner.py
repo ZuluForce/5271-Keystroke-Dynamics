@@ -5,19 +5,17 @@ class AbstractPartitioner:
     This class defines the basic interface for a partitioner.
     """
 
-    def partitionProfiles(self, fly_times, press_times):
+    def partitionProfiles(self, profiles):
         """
         Args:
-            fly_times : A map of profiles to the nested maps (dictionaries) that hold a given
-                profile's fly times. The keys for the main dictionary shall identify a profile
-                uniquely since they will be used later to identify the partitions.
-
-            press_times: A map of profiles to a map of the profile's press times.
+            profiles - The set of profiles for each user. Each user entry in this parameter should contain a
+                map with press times, fly times and the calculated words per minute. 
 
         Return:
-            A map of partitons to a list of the profiles in that partition. The profiles will
-            be identified by the keys used in the fly_time and press_time dictionaries.
+            A tuple ({partition profiles}, {users -> partition}). The first part of the tuple maps each
+            partition number (1,2,3...) to their corresponding profile. The second piece of the tuple maps
+            each user to the partition they are assigned.
         """
 
-        print("This is unimplemented partitionProfiles method. This class should be extended.")
+        print("This is the unimplemented partitionProfiles method. This class should be extended.")
         return
