@@ -29,6 +29,8 @@ def startReduction(outdir):
             
             sys.exit(2)
 
+        data['username'] = record.name
+
         out_file = "{}_reduced.json".format(record.email)
         out_file = os.path.join(outdir, out_file)
         out_file = out_file.replace(' ', '_').replace('@', '')

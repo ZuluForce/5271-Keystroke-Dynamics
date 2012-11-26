@@ -187,6 +187,7 @@ def reduceTimes(timeData):
     else:
         print("No entires in profile. There is likely something wrong")
         reduced_profile['mean_stdv'] = 0
+        sys.exit(2)
         
     ## Add the overall data on press and fly times
     all_press_times = filterOutliers(all_press_times)
@@ -199,6 +200,9 @@ def reduceTimes(timeData):
     mean, stdv = mean_and_stdv(all_fly_times)
     reduced_profile['fly_mean'] = mean
     reduced_profile['fly_stdv'] = stdv
+    
+    reduced_profile['num_fly_times'] = len(all_fly_times)
+    reduced_profile['num_press_times'] = len(all_press_times)
 
     return reduced_profile
 
