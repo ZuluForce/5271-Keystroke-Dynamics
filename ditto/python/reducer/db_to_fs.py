@@ -2,6 +2,7 @@ import os,sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,parentdir)
 
+import traceback
 import argparse
 import reduce_fns as rdc
 import db.queries as dbq
@@ -18,7 +19,15 @@ def startReduction(outdir):
     for record in records:
         # Reduce the profile and save it out to the fs
         data = json_to_object(record.data)
-        data = rdc.std_reduce(data)
+        try:
+            data = rdc.std_reduce(data)
+        except Exception as e:
+            print("Failed to reduce profile with email={}".format(record.email))
+            print("Error: " + str(e))
+            tb = traceback.format_exc()
+            print tb
+            
+            sys.exit(2)
 
         out_file = "{}_reduced.json".format(record.email)
         out_file = os.path.join(outdir, out_file)

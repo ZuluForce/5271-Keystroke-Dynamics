@@ -6,9 +6,11 @@ from util.json_handler import load_json
 from mappings.scan_code_maps import *
 from ditto_types import *
 
+ignore_umapped=False
 
 def unmapped_key_warn(key):
-    print("Warning: Input profile contains key not mapped to Ditto. key={}".format(key))
+    if not ignore_umapped:
+        print("Warning: Input profile contains key not mapped to Ditto. key={}".format(key))
 
 
 def json_to_ditto(in_profile, out_profile):
@@ -90,8 +92,11 @@ if __name__ == '__main__':
     parser.add_argument('profiles', metavar='P', type=str, nargs='+',
             help='profiles to convert')
     parser.add_argument('-o','--outdir', type=str, required=True, help="Output directory for partitioning information")
+    parser.add_argument('--ignore_unmapped', action='store_true', default=False, help="Ignore warnings about unmapped keys")
     
     args = parser.parse_args()
+
+    ignore_umapped = args.ignore_unmapped
 
     for profile in args.profiles:
         if 'user_map.json' in profile:

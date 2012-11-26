@@ -51,7 +51,7 @@ class FixedPartitioner(AbstractPartitioner):
 
         if 'text' not in profile:
             print("Cannot set profile for partition. Provided profile not in expected format (no text section)")
-            sys.exit(-1)
+            sys.exit(2)
 
         partitionDict[number]['fly_times'] = profile['text']['fly_times']
         partitionDict[number]['press_times'] = profile['text']['press_times']

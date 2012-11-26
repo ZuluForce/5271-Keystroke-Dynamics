@@ -40,7 +40,7 @@ def printPartitionSetInfo(partitionDir):
             data = js.load_json(fname)
         except Exception as e:
             print("Failed to load json: {}".format(fname))
-            sys.exit(-1)
+            sys.exit(2)
         
         pnum = int(filebase)
         if len(partitions) <= pnum:
@@ -63,6 +63,6 @@ def printPartitionSetInfo(partitionDir):
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: {} [partition directory]")
-        sys.exit(-1)
+        sys.exit(1)
         
     printPartitionSetInfo(sys.argv[1])

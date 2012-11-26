@@ -69,7 +69,7 @@ def loadProfiles(*filepaths):
         if not expectedJsonFormat(prof_data):
             print("Bad profile format: '{}'".format(path))
             print("The profile data likely hasn't been reduced yet")
-            sys.exit(-1)
+            sys.exit(1)
 
         if 'prof_name' in prof_data:
             fname = prof_data['prof_name']
@@ -77,7 +77,7 @@ def loadProfiles(*filepaths):
             m = user_name_re.search(fname)
             if m is None:
                 print("Cannot create internal name for profile. Either use the format of the reducer or provide a 'prof_name' key in the profile")
-                sys.exit(-1)
+                sys.exit(1)
             
             fname = m.group(1)
             
@@ -104,7 +104,7 @@ if __name__ == '__main__':
         partitioner = partitioners[args.partitioner]()
     except KeyError as e:
         print("Unknown partitioner '{}'".format(args.partitioner))
-        sys.exit(-1)
+        sys.exit(1)
 
     profiles = loadProfiles(*args.profiles)
 

@@ -11,7 +11,7 @@ if __name__ == '__main__':
         keyDelay = int(sys.argv[1])
         if keyDelay < 0:
             print("Invalid keyDelay value: " + str(keyDelay))
-            sys.exit(-1)
+            sys.exit(2)
 
 
     print("Generating sample profile with a uniform key delay of {} ms".format(keyDelay))
