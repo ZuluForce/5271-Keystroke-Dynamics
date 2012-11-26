@@ -13,7 +13,7 @@ def mean_and_stdv(data):
 
     if n <= 1:
         # Just wait for Mrs.Statistician to come along and correct me on the fact
-        # that the stdv of a single value is techincally undefined. Can we let it
+        # that the stdv of a single value is technically undefined. Can we let it
         # slide just this one time??
         return mean, 0
 
@@ -105,7 +105,7 @@ def reduceTimes(timeData):
         reduced_profile['mean_stdv'] = mean
     else:
         print("No entires in profile. There is likely something wrong")
-        reduced_profile['mean_std'] = 0
+        reduced_profile['mean_stdv'] = 0
 
     return reduced_profile
 
