@@ -34,6 +34,7 @@ def startReduction(outdir):
         out_file = "{}_reduced.json".format(record.email)
         out_file = os.path.join(outdir, out_file)
         out_file = out_file.replace(' ', '_').replace('@', '')
+        print("wpm:{}".format(data['wpm']))
         
         print("name:{} email:{} -> {}".format(record.name, record.email, out_file))
 

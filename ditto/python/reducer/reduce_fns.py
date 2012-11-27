@@ -116,16 +116,20 @@ def std_reduce(user_data):
         written to <out_file> as a json dump of the resulting python dictionary.
     """
     reduced_profile = {}
+    
+    wpm = 0
 
     for section,data in user_data.items():
         print("Section: {}".format(section))
+        if section == "text":
+            wpm = calculateWPM(data)
         reduced_times = reduceTimes(data)
         reduced_profile[section] = reduced_times
         
     # Add a placeholder for the wpm
     # Note: the reducer depends on this key being called 'wpm' so once this is actually
     #     implemented be sure to use the same key
-    reduced_profile['wpm'] = random.randint(0,80)
+    reduced_profile['wpm'] = wpm #random.randint(0,80)
     
     # Fill in missing fly and press times
     fillMissingTimes(reduced_profile)
@@ -205,6 +209,20 @@ def reduceTimes(timeData):
     reduced_profile['num_press_times'] = len(all_press_times)
 
     return reduced_profile
+
+def calculateWPM(data):
+    totalTime = 0
+    numWords = 212
+    for from_key, to_key in data['fly_times'].items():
+        from_key = int(from_key)
+        for to_key, times in to_key.items():
+            to_key = int(to_key)
+            
+            times = str_to_int_list(times)
+            times = filterOutliers(times)
+            for time in times:
+                totalTime += time
+    return  numWords / (totalTime / 60000) 
 
 def removePWFields(data):
     if 'text' not in data:
