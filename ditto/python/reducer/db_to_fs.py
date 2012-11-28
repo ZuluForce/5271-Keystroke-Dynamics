@@ -26,7 +26,7 @@ def startReduction(outdir):
             print("Error: " + str(e))
             tb = traceback.format_exc()
             print tb
-            
+
             sys.exit(2)
 
         data['username'] = record.name
@@ -35,7 +35,7 @@ def startReduction(outdir):
         out_file = os.path.join(outdir, out_file)
         out_file = out_file.replace(' ', '_').replace('@', '')
         print("wpm:{}".format(data['wpm']))
-        
+
         print("name:{} email:{} -> {}".format(record.name, record.email, out_file))
 
 

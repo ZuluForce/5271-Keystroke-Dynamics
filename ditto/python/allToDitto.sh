@@ -1,12 +1,19 @@
 #!/bin/bash
 
+function copyToBin() {
+  echo "Copying generated profiles to the ditto bin"
+  cp -v data/partitions/main/*.ditto ../bin
+}
+
 for var in "$@"
 do
-  if [[ var == "skip" ]]; then
+  if [[ $var == "skip" ]]; then
     copyToBin
     exit -1
   fi
 done
+
+exit 1
 
 # Reduce
 python reducer/db_to_fs.py -o data
@@ -37,8 +44,3 @@ python analysis/partition_set_info.py data/partitions/main
 if [[ $# -gt 0 && $1 == "deploy" ]]; then
   copyToBin
 fi
-
-function copyToBin() {
-  echo "Copying generated profiles to the ditto bin"
-  cp -v data/partitions/main/*.ditto ../bin
-}
