@@ -2,10 +2,13 @@ import sys
 from abstract_partitioner import AbstractPartitioner
 
 class FixedPartitioner(AbstractPartitioner):
-    def __init__(self):
+    def __init__(self, nonfixed=False):
         self.partionSize = 10  # Groups of people withing 10 wpm
-        self.lowestPartitionWPM = 20  #No group will have less than 25 wpm
+        self.lowestPartitionWPM = 20  #No group will have less than 20 wpm
         self.lowestPartitionNum = 2
+        
+        self.slidingPartitions = nonfixed
+        self.slidingWPM = [25, 40, 55, 65, 75, 85, 95, 100, 105, 110, 115, 120]
 
 
     def partitionProfiles(self, profiles):
@@ -37,12 +40,25 @@ class FixedPartitioner(AbstractPartitioner):
                 self.setPartitionProfile(partition_profiles, profiles[user], partition)
                 partition_profiles[partition]['source'] = user
                 
+        if self.slidingPartitions:
+            user_to_partition['partitioner'] = "scaled"
+        else:
+            user_to_partition['partitioner'] = "fixed"
+                
         return (partition_profiles, user_to_partition)
             
     
     def getPartitionNumFromWPM(self, wpm):
-        partition = int((wpm / self.partionSize) + 1)
-        return max(partition, self.lowestPartitionNum)
+        if not self.slidingPartitions:
+            for index, maxWPM in enumerate(self.slidingWPM):
+                if wpm < maxWPM:
+                    return index
+                
+            ## Means their typing speed is beyond what we have defined
+            return len(self.slidingWPM)
+        else:
+            partition = int((wpm / self.partionSize) + 1)
+            return max(partition, self.lowestPartitionNum)
 
 
     def setPartitionProfile(self, partitionDict, profile, number):
@@ -53,6 +69,10 @@ class FixedPartitioner(AbstractPartitioner):
             print("Cannot set profile for partition. Provided profile not in expected format (no text section)")
             sys.exit(2)
 
-        partitionDict[number]['fly_times'] = profile['text']['fly_times']
-        partitionDict[number]['press_times'] = profile['text']['press_times']
+        partitionDict[number] = profile['text']
+        #partitionDict[number]['fly_times'] = profile['text']['fly_times']
+        #partitionDict[number]['press_times'] = profile['text']['press_times']
         partitionDict[number]['wpm'] = profile['wpm']
+        
+    def __call__(self):
+        return self

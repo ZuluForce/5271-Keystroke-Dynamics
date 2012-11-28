@@ -14,7 +14,10 @@ import util.json_handler as js
 def printReducedProfileInfo(*profiles):
     for profile in profiles:
         all_data = js.load_json(profile)
-        pdata = all_data['text']
+
+        pdata = all_data
+        if 'text' in all_data:
+            pdata = all_data['text']
         
         print("\n=======================\n")
         print("Profile Name: {}".format(profile))

@@ -16,6 +16,7 @@ def printPartitionSetInfo(partitionDir):
     """
     partitions = []
     partition_to_users = {}
+    partition_type = ""
     
     for fname in os.listdir(partitionDir):
         (filebase, ext) = fname.rsplit('.',1)
@@ -31,7 +32,8 @@ def printPartitionSetInfo(partitionDir):
                     partition_to_users[partition] = []
                     
                 partition_to_users[partition].append(user)
-                
+            
+            partition_type = data['partitioner']
             continue
         
         # Load the json
@@ -49,6 +51,7 @@ def printPartitionSetInfo(partitionDir):
         partitions[pnum] = data
         
     # Now print all of them
+    print("\n---- Partitioner Type: {} ----\n".format(partition_type))
     for index,partition in enumerate(partitions):
         if partition is None:
             continue

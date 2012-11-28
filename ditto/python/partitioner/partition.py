@@ -7,7 +7,7 @@ import argparse
 
 # Adds the parentdir to the python path so we can easily import other modules
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-os.sys.path.insert(0,parentdir) 
+os.sys.path.insert(0,parentdir)
 
 from all_partitioners import partitioners
 import util.json_handler as js

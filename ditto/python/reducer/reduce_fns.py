@@ -5,7 +5,7 @@ from math import sqrt, ceil
 
 # When filling the fly times we need to know the highest possible
 # key value so we can iterate all pairs
-highest_key_code=220
+highest_key_code=60
 
 max_press_time=3  # seconds
 max_fly_time=4  # seconds
@@ -268,7 +268,7 @@ def fillMissingTimes(profile):
             # Then the fly time for that pair is missing
             addedFlyTimes += 1
 
-            variance = -1 + (random.random() * 2)
+            variance = -0.5 + random.random()
             time = mean_fly + (variance * stdv_fly)
             setFlyTime(profile['fly_times'], keyPair[0], keyPair[1], time)
 
