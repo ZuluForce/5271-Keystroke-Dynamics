@@ -15,13 +15,15 @@
 #include "util/timer.h"
 #include "util/semaphore.h"
 
+#define HELD_KEY_INTERVAL 33000 // 33ms
+
 struct PendingStroke {
 	InterceptionKeyStroke stroke;
 	ChronoMicroDuration wait_time;
 };
 
 struct KeyDownHist {
-	// When the key down event will be sent
+	// When the key down event was sent
 	ChronoClockPoint kd_dispatch_time;
 };
 

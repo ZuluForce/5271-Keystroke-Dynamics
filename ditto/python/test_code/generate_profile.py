@@ -1,4 +1,8 @@
-import sys
+import os,sys
+
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0,parentdir)
+
 from mappings.scan_code_maps import *
 from ditto_types import *
 

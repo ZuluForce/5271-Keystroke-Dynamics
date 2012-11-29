@@ -22,11 +22,15 @@ void BasicProfileEnforcer::dispatcher() {
 	ChronoClockPoint lapPoint, lastKeyDown;
 	lastKeyDown = ChronoClock::now();
 
-	ChronoMicroDuration lapDuration, flyTime, pressTime, sleepTime;
+	ChronoMicroDuration lapDuration, flyTime, pressTime, sleepTime, heldKeyTime;
+	heldKeyTime = ChronoStopwatch::durationFromMicro(HELD_KEY_INTERVAL);
 	KDProfileKey current_key = SCANCODE_A;
 
 	bool firstStroke = true;
+	bool lastStrokeDown = true;
 
+	// Used to print out the actual time it took for the fly
+	int delayTime = 0; // in ms
 
 	watch.start();
 	while (true) {
@@ -39,8 +43,19 @@ void BasicProfileEnforcer::dispatcher() {
 			exit(-1);
 		}
 
+		// Key-Down Event
 		if (stroke.state == INTERCEPTION_KEY_DOWN) {
-			flyTime = this->profileRef->getFlyTime(current_key, stroke.code);
+			/* Recalculate the sleeptime. We need to do this because if there are a lot pending
+			 * strokes with a set of held key keydown events then they will be released all at one
+			 * while if they were to come in normally they would have a delay at the maximum
+			 * repeat rate for the keyboard/OS.
+			 */
+			if (lastStrokeDown && current_key == stroke.code) {
+				flyTime = heldKeyTime;
+			} else {
+				flyTime = this->profileRef->getFlyTime(current_key, stroke.code);
+			}
+
 			sleepTime = lapPoint - lastKeyDown; // This gives us how long it has been since the last KD
 			sleepTime = flyTime - sleepTime; // How long we should sleep to satisfy the profile
 
@@ -58,12 +73,17 @@ void BasicProfileEnforcer::dispatcher() {
 			 * holds down a key we will receive multiple key down events but for the purpose
 			 * of measuring the press time we only want the first one.
 			 */
-			if (dispatchDownHist.count(current_key) == 0)
+			if (dispatchDownHist.count(current_key) == 0) {
+				// Not a held down key
 				dispatchDownHist[current_key] = kd_hist;
+			}
 
 			free(pStroke);
+			lastStrokeDown = true;
 
-			std::cout << "<DOWN(" << stroke.code << ")> time: " << lastKeyDown.time_since_epoch().count() << std::endl;
+			delayTime = (lastKeyDown - lapPoint).count();
+			delayTime = delayTime / 1000; // to get ms
+			std::cout << "<DOWN(" << stroke.code << ")> delayed: " << delayTime << " ms" << std::endl;
 		} else if (stroke.state == INTERCEPTION_KEY_UP) {
 			if (firstStroke && stroke.code == SCANCODE_RTRN) {
 				firstStroke = false;
@@ -93,8 +113,12 @@ void BasicProfileEnforcer::dispatcher() {
 			dispatchDownHist.erase(kd_hist_it);
 			free(pStroke);
 
-			lapPoint = watch.now();
-			std::cout << "<UP(" << stroke.code << ")> time: " << lapPoint.time_since_epoch().count() << std::endl;
+			// Used in detecting a held key
+			lastStrokeDown = false;
+
+			delayTime = (watch.now() - lapPoint).count();
+			delayTime = delayTime / 1000;  // get the time in ms
+			std::cout << "<UP(" << stroke.code << ")> delay: " << delayTime << " ms" << std::endl;
 		} else {
 			std::cerr << "dispatcher received stroke for unknown state (UP/DOWN)" << std::endl;
 			exit(-1);
