@@ -13,11 +13,21 @@ import util.json_handler as js
 
 def printReducedProfileInfo(*profiles):
     for profile in profiles:
+        if "user_map.json" in profile:
+            continue
+
         all_data = js.load_json(profile)
 
         pdata = all_data
         if 'text' in all_data:
             pdata = all_data['text']
+            
+        fly_total = num_fly = 0
+        for from_key, to_keys in pdata['fly_times'].items():
+            for to_key, time in to_keys.items():
+                num_fly += 1
+                fly_total += int(time)
+                
         
         print("\n=======================\n")
         print("Profile Name: {}".format(profile))
@@ -31,6 +41,7 @@ def printReducedProfileInfo(*profiles):
         print("Mean press time: {} ms".format(pdata['press_mean']))
         print("Standard Dev. press time: {} ms".format(pdata['press_stdv']))
         print("Overall profile variance: {}".format(pdata['mean_stdv']))
+        print("Recalculated mean fly: {} ms".format(fly_total / num_fly))
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

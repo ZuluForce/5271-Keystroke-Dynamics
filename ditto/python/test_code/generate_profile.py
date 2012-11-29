@@ -26,7 +26,7 @@ if __name__ == '__main__':
         for jsKeyTo in range(48,90):
             unit = FSProfileStruct()
             unit.setTimeType(FSProfileTimeType.FLY_TIME)
-            unit.setKeyTime(keyDelay)
+            unit.setKeyTimeMs(keyDelay)
 
             dittoKey = DittoSCFromJSCode(jsKeyFrom)
             if dittoKey < 0:

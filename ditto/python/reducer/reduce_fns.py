@@ -1,5 +1,6 @@
 import os,sys
 import re
+import time
 import random
 from math import sqrt, ceil
 
@@ -7,8 +8,7 @@ from math import sqrt, ceil
 # key value so we can iterate all pairs
 highest_key_code=60
 
-max_press_time=3  # seconds
-max_fly_time=4  # seconds
+max_key_time=2000  # 2 seconds
 
 def mean_and_stdv(data):
     """ Given a list of <data> return a tuple with the (mean,stdv) of the
@@ -41,6 +41,11 @@ def filterOutliers(times):
 
     newTimes = []
     for time in times:
+        # If there is only one element in the list it may not be an outlier but
+        # but it could still be erroneous
+        if time > max_key_time:
+            continue
+
         if okRange[0] <= time <= okRange[1]:
             newTimes.append(time)
 
@@ -118,6 +123,7 @@ def std_reduce(user_data):
 
     wpm = 0
 
+    random.seed(time.time())
     for section,data in user_data.items():
         print("Section: {}".format(section))
         if section == "text":
@@ -131,7 +137,7 @@ def std_reduce(user_data):
     reduced_profile['wpm'] = wpm #random.randint(0,80)
 
     # Fill in missing fly and press times
-    fillMissingTimes(reduced_profile)
+    ##fillMissingTimes(reduced_profile)
 
     return reduced_profile
 
@@ -161,6 +167,9 @@ def reduceTimes(timeData):
 
             times = str_to_int_list(times)
             times = filterOutliers(times)
+            if len(times) == 0:
+                continue
+
             mean, stdv = mean_and_stdv(times)
 
             reduced_profile['fly_times'][from_key][to_key] = mean
@@ -175,6 +184,9 @@ def reduceTimes(timeData):
 
         times = str_to_int_list(times)
         times = filterOutliers(times)
+        if len(times) == 0:
+            continue
+
         mean, stdv = mean_and_stdv(times)
 
         reduced_profile['press_times'][key] = mean

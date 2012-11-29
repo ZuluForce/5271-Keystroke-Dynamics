@@ -31,7 +31,7 @@ class FSProfileStruct(Structure):
     def setTimeType(self, t):
         self.time_type = t
 
-    def setKeyTime(self, t):
+    def setKeyTimeMs(self, t):
         self.time_in_ms = t
 
     def setFromKey(self, val):
@@ -61,8 +61,8 @@ def getStructBytes(struct):
 
     return bytefile.getvalue()
 
-def writeStruct(file, struct):
-    file.write(getStructBytes(struct))
+def writeStruct(f, struct):
+    f.write(getStructBytes(struct))
 
 if __name__ == '__main__':
     unit = FSProfileStruct()
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     unit.setToKey(10)
     unit.setFromKey(20)
     unit.setTimeType(FSProfileTimeType.FLY_TIME)
-    unit.setKeyTime(200) # 200ms fly time from key(20) -> key(10)
+    unit.setKeyTimeMs(200) # 200ms fly time from key(20) -> key(10)
 
     fakefile = BytesIO()
     fakefile.write(unit)

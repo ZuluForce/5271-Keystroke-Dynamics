@@ -27,41 +27,54 @@ def json_to_ditto(in_profile, out_profile):
     stdv_re = re.compile("^[0-9]+_stdv$")
 
     total_fly = total_press = 0
+    fly_time_total = press_time_total = 0
+    
+    # When we can't map from the js to the ditto code for a key we throw it out. This can
+    # have an impact on the overall fly and press times for a profile
+    thrown_fly = []
+    thrown_press = []
+    
+    num_stdv = 0
 
     unit = FSProfileStruct()
     unit.setTimeType(FSProfileTimeType.FLY_TIME)
 
     for from_key, to_key_info in json_profile['fly_times'].items():
-        for key, value in to_key_info.items():
-            if stdv_re.match(key):
+        for to_key, time in to_key_info.items():
+            if stdv_re.match(to_key):
                 # We don't include any stdv info in ditto profiles right now
+                num_stdv += 1
                 continue
 
             mapped_key = DittoSCFromJSCode(int(from_key))
             if mapped_key < 0:
                 unmapped_key_warn(from_key)
+                thrown_fly.append(int(time))
                 continue
 
             unit.setFromKey(mapped_key)
 
-            mapped_key = DittoSCFromJSCode(int(key))
+            mapped_key = DittoSCFromJSCode(int(to_key))
             if mapped_key < 0:
-                unmapped_key_warn(key)
+                unmapped_key_warn(to_key)
+                thrown_fly.append(int(time))
                 continue
 
             unit.setToKey(mapped_key)
 
-            unit.setKeyTime(int(value))
+            unit.setKeyTimeMs(int(time))
 
             writeStruct(ditto_profile, unit)
             total_fly += 1
+            fly_time_total += int(time)
 
     ## Setup for adding press times
     unit.setTimeType(FSProfileTimeType.PRESS_TIME)
 
-    for key, time_info in json_profile['press_times'].items():
+    for key, time in json_profile['press_times'].items():
         if stdv_re.match(key):
             # Once again, we don't include stdv right now
+            num_stdv += 1
             continue
 
         # For press times Ditto just takes the 'from' key but to be safe
@@ -70,22 +83,30 @@ def json_to_ditto(in_profile, out_profile):
         if mapped_key < 0:
             # They will already get the warning in fly times
             #unmapped_key_warn(key)
+            thrown_press.append(int(time))
             continue
 
         unit.setFromKey(mapped_key)
         unit.setToKey(mapped_key)
 
-        unit.setKeyTime(int(time_info))
+        unit.setKeyTimeMs(int(time))
 
         writeStruct(ditto_profile, unit)
         total_press += 1
+        press_time_total += int(time)
 
     ditto_profile.close()
 
     print("\nFinished converting source profile '{}' to ditto profile '{}'".format(in_profile, out_profile))
     print("\t# Fly Times: {}".format(total_fly))
     print("\t# Press Times: {}".format(total_press))
-
+    print("\tFly time average: {}".format(fly_time_total / total_fly))
+    print("\tPress time average: {}".format(press_time_total / total_press))
+    if len(thrown_fly) > 0:
+        print("\tAverage of unmapped fly times: {}".format(sum(thrown_fly) / len(thrown_fly)))
+    if len(thrown_press) > 0:
+        print("\tAverage of unmapped press times: {}".format(sum(thrown_press) / len(thrown_press)))
+    print("\tIgnored {} standard deviation entries".format(num_stdv))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Convet a set of json profiles to ditto binary profiles")

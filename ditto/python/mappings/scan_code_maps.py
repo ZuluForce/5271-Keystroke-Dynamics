@@ -130,6 +130,12 @@ def DittoSCFromJSCode(jscode):
     except:
         return -1
 
+def JSCodeFromDittoSC(dcode):
+    for jscode,ditto in JSCodeToDitto.items():
+        if ditto == dcode:
+            return jscode
+        
+    return -1
 
 if __name__ == '__main__':
     print("JS(67) = Ditto({})".format(DittoSCFromJSCode(67)))
