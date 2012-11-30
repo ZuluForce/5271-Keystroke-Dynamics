@@ -28,17 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
             this.typingBoxText = new System.Windows.Forms.TextBox();
             this.typingBoxLabel = new System.Windows.Forms.Label();
             this.logoutButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // typingBoxText
             // 
-            this.typingBoxText.Location = new System.Drawing.Point(68, 46);
+            this.typingBoxText.Location = new System.Drawing.Point(68, 256);
             this.typingBoxText.Multiline = true;
             this.typingBoxText.Name = "typingBoxText";
-            this.typingBoxText.Size = new System.Drawing.Size(668, 437);
+            this.typingBoxText.Size = new System.Drawing.Size(668, 243);
             this.typingBoxText.TabIndex = 0;
             this.typingBoxText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.typingBoxText_KeyDown);
             this.typingBoxText.KeyUp += new System.Windows.Forms.KeyEventHandler(this.typingBoxText_KeyUp);
@@ -61,11 +64,32 @@
             this.logoutButton.UseVisualStyleBackColor = true;
             this.logoutButton.Click += new System.EventHandler(this.logoutButton_Click);
             // 
+            // label1
+            // 
+            this.label1.Location = new System.Drawing.Point(113, 65);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(555, 174);
+            this.label1.TabIndex = 3;
+            this.label1.Text = resources.GetString("label1.Text");
+            this.label1.Click += new System.EventHandler(this.label1_Click_1);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(702, 78);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(100, 26);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "Test Arrays";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.testFilterTimes);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(815, 605);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.logoutButton);
             this.Controls.Add(this.typingBoxLabel);
             this.Controls.Add(this.typingBoxText);
@@ -83,5 +107,7 @@
         private System.Windows.Forms.TextBox typingBoxText;
         private System.Windows.Forms.Label typingBoxLabel;
         private System.Windows.Forms.Button logoutButton;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button button1;
     }
 }
