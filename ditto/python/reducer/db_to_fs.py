@@ -8,8 +8,8 @@ import reduce_fns as rdc
 import db.queries as dbq
 from util.json_handler import json_to_object, write_json
 
-def startReduction(outdir):
-    records = dbq.getAllCompleted()
+def startReduction(outdir, email=None):
+    records = dbq.getAllCompleted(email=email)
     if records is None:
         print("Failed to retrieve records from database")
         return
@@ -50,6 +50,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--table", help="name of the table in the db with the data", default=dbq.db_table)
     parser.add_argument("-m", "--host", "--machine", help="machine hosting the db", default=dbq.db_host)
     parser.add_argument("-o", "--outdir", nargs="?", help="default this directory", default=".")
+    parser.add_argument("--profile", help="Only reduce the profile with this email")
 
     args = parser.parse_args()
     dbq.db_user = args.dbuser
@@ -58,5 +59,5 @@ if __name__ == '__main__':
     dbq.db_host = args.host
 
     print args
-
-    startReduction(args.outdir)
+    
+    startReduction(args.outdir, email=args.profile)

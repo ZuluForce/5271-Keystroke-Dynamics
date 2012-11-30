@@ -86,6 +86,8 @@ int FSProfileLoader::loadProfile(KDProfile& profile, KDProfileID& id) {
 	std::cout << "\tTotal Read: " << numRead << std::endl;
 	std::cout << "\tNum Fly Times: " << numFly << std::endl;
 	std::cout << "\tNum Press Times: " << numPress << std::endl;
+	std::cout << "\tAverage Fly Time: " << profile.getAverageFlyTimeMs() << " ms" << std::endl;
+	std::cout << "\tAverage Press Time: " << profile.getAveragePressTimeMs() << " ms" << std::endl;
 	fclose(input);
 	return 0;
 }

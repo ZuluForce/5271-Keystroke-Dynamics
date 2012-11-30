@@ -105,6 +105,7 @@ int checkRequiredOptions(DittoOptions* options) {
 
 int main(int argc, char* argv[]) {
 	std::cout << "A wild ditto appeared" << std::endl;
+	raise_process_priority();
 
     DittoOptions* options = parseCmdLine(argc, argv);
 

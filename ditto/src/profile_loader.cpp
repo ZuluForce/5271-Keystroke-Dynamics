@@ -7,6 +7,9 @@ KDProfile::KDProfile(uint32_t matrixSize) {
 	this->ensurePressVectorSize(matrixSize);
 
 	fastest_flight = fastest_to = fastest_from = -1;
+
+	num_flytimes = total_flytimes = 0;
+	num_presstimes = total_presstimes = 0;
 }
 
 void KDProfile::ensureMatrixSize(uint32_t width, uint32_t height) {
@@ -34,12 +37,18 @@ void KDProfile::addFlyTime(uint32_t from, uint32_t to, int64_t ftime) {
 		fastest_to = to;
 	}
 
+    ++num_flytimes;
+	total_flytimes += ftime;
+
 	ChronoMicroDuration duration = ChronoStopwatch::durationFromMicro(ftime);
 	fly_times.at(from).at(to) = duration;
 }
 
 void KDProfile::addPressTime(uint32_t key, int64_t ptime) {
 	this->ensurePressVectorSize(key);
+
+    ++num_presstimes;
+    total_presstimes += ptime;
 
 	ChronoMicroDuration duration = ChronoStopwatch::durationFromMicro(ptime);
 	press_times.at(key) = duration;
@@ -56,6 +65,14 @@ ChronoMicroDuration KDProfile::getFlyTime(uint32_t from, uint32_t to) {
 
 ChronoMicroDuration KDProfile::getPressTime(uint32_t key) {
 	return press_times.at(key);
+}
+
+int64_t KDProfile::getAverageFlyTimeMs() {
+    return (total_flytimes / num_flytimes) / 1000;
+}
+
+int64_t KDProfile::getAveragePressTimeMs() {
+    return (total_presstimes / num_presstimes) / 1000;
 }
 
 KDProfileID::KDProfileID(std::string name)

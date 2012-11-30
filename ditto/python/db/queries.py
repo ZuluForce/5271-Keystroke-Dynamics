@@ -1,3 +1,4 @@
+import sys
 import MySQLdb as mdb
 
 """
@@ -22,7 +23,11 @@ def getAllCompleted(name=None, email=None):
     global con
     try:
         if con is None:
-            con = mdb.connect(db_host,db_user,db_pass,db)
+            try:
+                con = mdb.connect(db_host,db_user,db_pass,db)
+            except Exception as e:
+                print("Failed to connect to database: {}".format(e))
+                sys.exit(2)
 
         cur = con.cursor()
         query = "SELECT name,email,json_data FROM {} WHERE submitted=1".format(db_table)

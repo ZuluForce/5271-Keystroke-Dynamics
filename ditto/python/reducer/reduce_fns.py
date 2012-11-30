@@ -2,11 +2,14 @@ import os,sys
 import re
 import time
 import random
-from math import sqrt, ceil
+from math import sqrt
+from scipy.stats import scoreatpercentile, percentileofscore
+from numpy import array
 
 # When filling the fly times we need to know the highest possible
 # key value so we can iterate all pairs
-highest_key_code=60
+lowest_key_code=8
+highest_key_code=90
 
 max_key_time=2000  # 2 seconds
 
@@ -32,65 +35,37 @@ def mean_and_stdv(data):
     return mean,stdv
 
 
-def filterOutliers(times):
-    (median, q1, q3) = findQuartiles(times)
+def filterOutliers(times, irq_range=.5, rtn_range=False):
+    # We need the original indexes for marking which were removed
+    original_times = list(times)
+
+    times.sort()
+    np_times = array(times)
+    q1 = scoreatpercentile(np_times, 25, interpolation_method='fraction')
+    q3 = scoreatpercentile(np_times, 75, interpolation_method='fraction')
     irq = q3-q1
-    slack = 1.5 * irq
+    slack = irq_range * irq
 
     okRange = (q1-slack, q3+slack)
 
     newTimes = []
-    for time in times:
+    rm_indexes = []
+    for index,time in enumerate(original_times):
         # If there is only one element in the list it may not be an outlier but
         # but it could still be erroneous
         if time > max_key_time:
+            rm_indexes.append(index)
             continue
 
         if okRange[0] <= time <= okRange[1]:
             newTimes.append(time)
+        else:
+            rm_indexes.append(index)
 
-    return newTimes
-
-def findQuartiles(times):
-    if len(times) == 1:
-        return (times[0],0,times[0])
-
-    (median, low, high) = findMedian(times)
-
-    (q1, q1_low, q1_high) = findMedian(low)
-    (q3, q3_low, q3_high) = findMedian(high)
-
-    return (median, q1, q3)
-
-def findMedian(times):
-    if len(times) == 0:
-        return (0,0,0)
-
-    if len(times) == 1:
-        return (times[0], 0,times[0])
-
-    times.sort()
-
-    m_index_low = m_index_high = -1
-    low_half = high_half = None
-    median = 0
-
-    # Find the median value first
-    if len(times) % 2 == 0:
-        m_index_low = (len(times) / 2) - 1
-        m_index_high = m_index_low + 1
-        median = (times[m_index_low] + times[m_index_high]) / 2
-        low_half = times[:m_index_low]
-        high_half = times[m_index_high:]
+    if rtn_range:
+        return newTimes, rm_indexes, okRange
     else:
-        m_index_low = m_index_high = len(times) / 2
-        median = times[m_index_low]
-        low_half = times[:m_index_low]
-        high_half = times[m_index_low+1:]
-
-    #print("(median, low, high) = ({},{},{})".format(median, low_half, high_half))
-    return (median, low_half, high_half)
-
+        return newTimes, rm_indexes
 
 def str_to_int_list(l):
     new_list = []
@@ -137,7 +112,7 @@ def std_reduce(user_data):
     reduced_profile['wpm'] = wpm #random.randint(0,80)
 
     # Fill in missing fly and press times
-    ##fillMissingTimes(reduced_profile)
+    fillMissingTimes(reduced_profile)
 
     return reduced_profile
 
@@ -156,8 +131,13 @@ def reduceTimes(timeData):
     # This data is used in filling in gaps later on where we are missing fly or press times
     all_fly_times = []
     all_press_times = []
+    
+    # When we filter later we need to know which keys to remove from the profile
+    fly_time_pairs = []
+    press_time_keys = []
 
     # Mean and std deviation for fly times
+    print("Processing raw fly times")
     for from_key, to_keys in timeData['fly_times'].items():
         from_key = int(from_key)
         reduced_profile['fly_times'][from_key] = {}
@@ -166,47 +146,57 @@ def reduceTimes(timeData):
             to_key = int(to_key)
 
             times = str_to_int_list(times)
-            times = filterOutliers(times)
+            times,removed = filterOutliers(times)
+
             if len(times) == 0:
                 continue
 
             mean, stdv = mean_and_stdv(times)
 
             reduced_profile['fly_times'][from_key][to_key] = mean
-            reduced_profile['fly_times'][from_key]["{}_stdv".format(to_key)] = stdv
 
             stdv_list.append(stdv)
             all_fly_times.append(mean)
+            fly_time_pairs.append((from_key, to_key))
 
     # Mean and std deviation for press times
+    print("Processing raw press times")
     for key, times in timeData['press_times'].items():
         key = int(key)
 
         times = str_to_int_list(times)
-        times = filterOutliers(times)
+        times,removed = filterOutliers(times)
         if len(times) == 0:
             continue
 
         mean, stdv = mean_and_stdv(times)
 
         reduced_profile['press_times'][key] = mean
-        reduced_profile['press_times']["{}_stdv".format(key)] = stdv
 
         stdv_list.append(stdv)
         all_press_times.append(mean)
-
-    # Add the mean of all std deviations
-    if len(stdv_list) != 0:
-        (mean,stdv) = mean_and_stdv(times)
-        reduced_profile['mean_stdv'] = mean
-    else:
-        print("No entires in profile. There is likely something wrong")
-        reduced_profile['mean_stdv'] = 0
-        sys.exit(2)
+        press_time_keys.append(key)
 
     ## Add the overall data on press and fly times
-    all_press_times = filterOutliers(all_press_times)
-    all_fly_times = filterOutliers(all_fly_times)
+    all_press_times,removed_press,rng_press = filterOutliers(all_press_times, irq_range=.4, rtn_range=True)
+    all_fly_times,removed_fly,rng_fly = filterOutliers(all_fly_times, irq_range=.4, rtn_range=True)
+    
+    reduced_profile['filtered_fly'] = len(removed_fly)
+    reduced_profile['filtered_press'] = len(removed_press)
+    reduced_profile['irq_range_fly'] = rng_fly
+    reduced_profile['irq_range_press'] = rng_press
+    
+    for index in removed_fly:
+        keyPair = fly_time_pairs[index]
+        from_key = keyPair[0]
+        to_key = keyPair[1]
+
+        del reduced_profile['fly_times'][from_key][to_key]
+        
+    for index in removed_press:
+        key = press_time_keys[index]
+        
+        del reduced_profile['press_times'][key]
 
     mean, stdv = mean_and_stdv(all_press_times)
     reduced_profile['press_mean'] = mean
@@ -215,6 +205,15 @@ def reduceTimes(timeData):
     mean, stdv = mean_and_stdv(all_fly_times)
     reduced_profile['fly_mean'] = mean
     reduced_profile['fly_stdv'] = stdv
+    
+    count = 0
+    for k,v in reduced_profile['fly_times'].items():
+        for k2,v2 in v.items():
+            count += 1
+
+    if count != len(all_fly_times):
+        print("Post reduction fly time count is not as expected (actual: {}, expected: {})".format(count,len(all_fly_times)))
+        sys.exit(2)
 
     reduced_profile['num_fly_times'] = len(all_fly_times)
     reduced_profile['num_press_times'] = len(all_press_times)
@@ -230,7 +229,7 @@ def calculateWPM(data):
             to_key = int(to_key)
 
             times = str_to_int_list(times)
-            times = filterOutliers(times)
+            times,removed = filterOutliers(times, irq_range=1.25)
             for time in times:
                 totalTime += time
     return numWords / (totalTime / 60000) 
@@ -261,19 +260,18 @@ def fillMissingTimes(profile):
     profile = profile['text']
     #print profile
     #print("Fly times:\n" + str(profile['fly_times']))
+    #sys.exit(2)
 
     mean_press = profile['press_mean']
     stdv_press = profile['press_stdv']
     mean_fly = profile['fly_mean']
     stdv_fly = profile['fly_stdv']
 
-    random.seed()
-
     addedFlyTimes = 0
     addedPressTimes = 0
 
     # Fill missing fly times
-    for keyPair in generateFlyPairs(highest_key_code):
+    for keyPair in generateFlyPairs(lowest_key_code, highest_key_code):
         time = getFlyTime(profile['fly_times'], keyPair[0], keyPair[1])
 
         if time is None:
@@ -285,7 +283,7 @@ def fillMissingTimes(profile):
             setFlyTime(profile['fly_times'], keyPair[0], keyPair[1], time)
 
     # Fill missing press times
-    for key in range(highest_key_code):
+    for key in range(lowest_key_code,highest_key_code+1):
         time = getPressTime(profile['press_times'], key)
         if time is None:
             addedPressTimes += 1
@@ -298,8 +296,9 @@ def fillMissingTimes(profile):
     print("Added {} missing fly times".format(addedFlyTimes))
     print("Added {} missing press times".format(addedPressTimes))
 
-    total_combos = pow(highest_key_code, 2)
-    if addedFlyTimes == total_combos or addedPressTimes == highest_key_code:
+    num_key_codes = (highest_key_code - lowest_key_code)
+    total_combos = pow(num_key_codes, 2)
+    if addedFlyTimes == total_combos or addedPressTimes == num_key_codes:
         print("Every single possible fly and/or press time entry was filled as if missing")
         print("Something is likely wrong or the profile is empty")
         sys.exit(2)
@@ -329,13 +328,13 @@ def getPressTime(pressTimeMap, key):
 def setPressTime(pressTimeMap, key, time):
     pressTimeMap[key] = time
 
-def generateFlyPairs(keySpaceSize):
+def generateFlyPairs(start, end):
     """
     This will iterate through all pairs of integers (keys) that are within the given
     keySpaceSize. If keySpaceSize=100 this generator will produce the pairs from
     (0,0) -> (100,100) and every combination in between. Note: (10,2) != (2,10)
     """
-    for from_key in range(keySpaceSize):
-        for to_key in range(keySpaceSize):
+    for from_key in range(start,end+1):
+        for to_key in range(start,end+1):
             yield (from_key,to_key)
 

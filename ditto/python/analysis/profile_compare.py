@@ -18,7 +18,7 @@ def loadAndCompareProfiles(prof1, prof2):
     if prof2_data is None:
         print("Failed to load profile: {}".format(prof2))
 
-def compareProfiles(prof1_data, prof2_data, timeToInt=False):
+def compareProfiles(prof1_data, prof2_data, timeToInt=False, ignoreTime=False, recursed=False):
     if 'text' in prof1_data:
         prof1_data = prof1_data['text']
         
@@ -37,7 +37,8 @@ def compareProfiles(prof1_data, prof2_data, timeToInt=False):
         from_key_int = int(from_key)
 
         for to_key, time in times.items():
-            if type(to_key) == str and to_key.endswith("_stdv"):
+            #print("type to_key = {}; value = {}".format(type(to_key), to_key))
+            if type(to_key) in (str,unicode) and to_key.endswith("_stdv"):
                 continue
             
             to_key_str = str(to_key)
@@ -64,11 +65,11 @@ def compareProfiles(prof1_data, prof2_data, timeToInt=False):
                 time = int(time)
                 prof2_time = int(prof2_time)
 
-            if prof2_time != time:
+            if not ignoreTime and prof2_time != time:
                 print("flytime {} -> {} not equal (1:{}, 2:{})".format(from_key,to_key,time,prof2_time))
                 
     for key, time in prof1_press.items():
-        if type(key) == str and key.endswith("_stdv"):
+        if type(key) in (str,unicode) and key.endswith("_stdv"):
             continue
 
         key_str = str(key)
@@ -86,10 +87,13 @@ def compareProfiles(prof1_data, prof2_data, timeToInt=False):
             time = int(time)
             prof2_time = int(prof2_time)
 
-        if time != prof2_time :
+        if not ignoreTime and time != prof2_time :
             print("presstime {} not equal (1:{}, 2:{})".format(key, time, prof2_time))
             
-    print("Finished comparing profiles")
+    if not recursed:
+        print("Reversing profiles and checking for missing values the other way")
+        compareProfiles(prof2_data, prof1_data, ignoreTime=True, recursed=True)
+        print("Finished comparing profiles")
                 
                 
 if __name__ == '__main__':

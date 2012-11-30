@@ -25,6 +25,18 @@ def json_to_ditto(in_profile, out_profile):
         return False
 
     stdv_re = re.compile("^[0-9]+_stdv$")
+    
+    # print out info on the size of the input profile
+    sz = 0
+    for k,v in json_profile['fly_times'].items():
+        for k2,v2 in v.items():
+            if stdv_re.match(k2):
+                continue
+ 
+            sz += 1
+            
+    print("# fly times in input profile = " + str(sz))
+    
 
     total_fly = total_press = 0
     fly_time_total = press_time_total = 0

@@ -30,6 +30,9 @@ private:
 	int64_t fastest_flight;
 	uint32_t fastest_from, fastest_to;
 
+	int64_t num_flytimes, total_flytimes;
+	int64_t num_presstimes, total_presstimes;
+
 public:
 	KDProfile(uint32_t matrixSize=127);
 	void addFlyTime(uint32_t from, uint32_t to, int64_t ftime);
@@ -39,6 +42,9 @@ public:
 
 	ChronoMicroDuration getFlyTime(uint32_t from, uint32_t to);
 	ChronoMicroDuration getPressTime(uint32_t key);
+
+	int64_t getAverageFlyTimeMs();
+	int64_t getAveragePressTimeMs();
 };
 
 class KDProfileID {
