@@ -69,48 +69,62 @@ namespace masada
 
         }
 
-        private double Mahalanobis(double[] profileData, double[] collectedData) 
+        /*
+         * Calculates the distance between two n x 1 vectors.
+         */
+        private double Mahalanobis(Matrix profileData, Matrix collectedData) 
         {
-            double[,] covM;
-            double[] xMy;
-            double[] xMyTranspose;
-            double[,] distance;
-            double[,] joinedMatrix;
+            // Average of the profile data
+            double meanProfileData = calculateMean(profileData);
+            
+            // Average of the collected data
+            double meanCollectedData = calculateMean(collectedData);
 
-            int info;
-            alglib.matinvreport rep;
+            // New matrix to hold the adjusted profile and collected data matrices
+            Matrix B = new Matrix(profileData.rows, 2);
+            B.SetCol(matrixSubtraction(profileData, meanProfileData), 0);
+            B.SetCol(matrixSubtraction(collectedData, meanCollectedData), 1);
 
-            joinedMatrix = joinMatrix(profileData, collectedData);
+            // Covariance of the data
+            double covM = matrixCov(B);
 
-            alglib.covm(joinedMatrix, out covM);
+            // Calculates the distance (before taking the square root)
+            Matrix result = Matrix.Transpose(profileData - collectedData) * ((1/covM) * (profileData - collectedData));
 
-            xMy = matrixSubtraction(profileData, collectedData);
-            // Dunno if i need this
-            xMyTranspose = matrixTranspose(xMy);
+            // Final distance
+            double retVal = Math.Sqrt(result[0, 0]);
 
-            alglib.rmatrixinverse(ref covM, out info, out rep);
-
-            distance = vectorMatrixMultiply(xMyTranspose, covM);
-            distance = matrixVectorMultiply(distance, xMy);
-
-
-            return 0;
+            return retVal;
 
         }
 
-        private double[,] joinMatrix(double[] x, double[] y)
+        //Calculate the covariance of a matrix
+        private double matrixCov(Matrix x)
         {
-            double[,] joined = new double[x.GetLength(0), 2];
+            double total = 0;
+            double count = x.rows;
 
-            for (int i = 0; i < x.GetLength(0); i++)
+            for (int i = 0; i < x.rows; i++)
             {
-                for (int j = 0; j < 1; j++)
-                {
-                    joined[i, j] = x[i];
-                    joined[i, j + 1] = y[i];
-                }
+                total += x[i, 0] * x[i, 1];
             }
-            return joined;
+
+            return total / (count - 1);
+        }
+
+        // Calculate the mean of a n x 1 matrix
+        private double calculateMean(Matrix data)
+        {
+            double size = data.rows;
+            double total = 0;
+
+
+            for (int i = 0; i < size; i++)
+            {
+                total += data[i, 0];
+            }
+
+            return total / size;
         }
 
         // Filters out times based upon maxFilterTime
@@ -184,78 +198,30 @@ namespace masada
                 System.Diagnostics.Debug.WriteLine(test2[i, 0] + ", " + test2[i, 1]);
             }
 
-            double[,] covM;
-            double[,] test3 = new double[,] { {1, 1}, {2, 2}, {3, 3} };
-            // Calculate the covariance matrix between matrices x, y
-            alglib.covm(test3, out covM);
-            
-            System.Diagnostics.Debug.WriteLine("CovMatrix:");
-            for (int i = 0; i < covM.GetLength(0); i++)
-            {
-                for (int j = 0; j < covM.GetLength(1); j++)
-                {
-                    System.Diagnostics.Debug.WriteLine(covM[i, j] + ", " + covM[i, j]);
-                }
-            }
+            Matrix a = new Matrix(4, 1);
+            Matrix b = new Matrix(4, 1);
+            a.mat[0,0] = 1;
+            a.mat[1,0] = 2;
+            a.mat[2, 0] = 3;
+            a.mat[3, 0] = 4;
+            b.mat[0, 0] = 1.2;
+            b.mat[1, 0] = 2.01;
+            b.mat[2, 0] = 2.95;
+            b.mat[3, 0] = 4.02;
 
-            System.Diagnostics.Debug.WriteLine("Calculating Mahalanobis distance");
-
-            double[] d1 = new double[] { 1, 2, 3 };
-            double[] d2 = new double[] { 1, 2, 3 };
-
-            double result = Mahalanobis(d1, d2);
-
-            System.Diagnostics.Debug.WriteLine("distance: " + result);
-
+            System.Diagnostics.Debug.WriteLine("Distance is: " + Mahalanobis(a, b));
         }
 
-        // Does x - y
-        private double[] matrixSubtraction(double[] x, double[] y)
+        // Does (Matrix) x - (double) y
+        private Matrix matrixSubtraction(Matrix x, double y)
         {
-            double[] retVal = new double[x.GetLength(0)];
-            for (int i = 0; i < x.GetLength(0); i++)
+            Matrix retVal = new Matrix(x.rows, 1);
+            for (int i = 0; i < x.rows; i++)
             {
-                retVal[i] = x[i] - y[i];
+                retVal[i, 0] = x[i, 0] - y;
             }
 
             return retVal;
-        }
-
-        private double[] matrixTranspose(double[] x)
-        {
-            double[] transpose = new double[x.GetLength(0)];
-
-            for (int i = 0; i < x.GetLength(0); i++)
-            {
-                transpose[i] = x[i];
-            }
-            return transpose;
-        }
-
-        private double[,] vectorMatrixMultiply(double[] x, double[,] y)
-        {
-            double[,] multipled = new double[x.GetLength(0), y.GetLength(1)];
-            for (int i = 0; i < x.GetLength(0); i++)
-            {
-                for (int j = 0; j < y.GetLength(1); j++)
-                {
-                    multipled[i, j] += x[i] * y[i, j];
-                }
-            }
-            return multipled;
-        }
-
-        private double[,] matrixVectorMultiply(double[,] x, double[] y)
-        {
-            double[,] multipled = new double[x.GetLength(0), y.GetLength(0)];
-            for (int i = 0; i < x.GetLength(0); i++)
-            {
-                for (int j = 0; j < y.GetLength(0); j++)
-                {
-                    multipled[i, j] += x[i, j] * y[j];
-                }
-            }
-            return multipled;
         }
     }
 }
