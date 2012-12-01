@@ -2,6 +2,10 @@ import os,sys
 import re
 import time
 import random
+
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0,parentdir)
+from mappings.scan_code_maps import JS_BACKSPACE 
 from math import sqrt
 from scipy.stats import scoreatpercentile, percentileofscore
 from numpy import array
@@ -229,10 +233,13 @@ def calculateWPM(data):
             to_key = int(to_key)
 
             times = str_to_int_list(times)
-            times,removed = filterOutliers(times, irq_range=1.25)
+            times,removed = filterOutliers(times, irq_range=1.5)
             for time in times:
-                totalTime += time
-    return numWords / (totalTime / 60000) 
+                if to_key == JS_BACKSPACE:
+                    totalTime += 3*time
+                else:
+                    totalTime += time
+    return numWords / (totalTime / 60000.0) 
 
 def removePWFields(data):
     if 'text' not in data:

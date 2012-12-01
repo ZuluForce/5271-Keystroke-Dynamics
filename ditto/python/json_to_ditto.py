@@ -19,6 +19,9 @@ def json_to_ditto(in_profile, out_profile):
 
     json_profile = load_json(in_profile)
     ditto_profile = open(out_profile, "wb")
+    
+    if 'text' in json_profile:
+        json_profile = json_profile['text']
 
     if (json_profile is None) or (ditto_profile is None):
         print("Failed to load required data(json: {}, out: {})".format(json_profile,ditto_profile))

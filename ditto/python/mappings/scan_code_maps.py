@@ -61,6 +61,7 @@ JSCodeToDitto = {
     222 : 0x28, # '
 }
 
+JS_BACKSPACE = 8
 
 DittoSCToChar = {
     0x0E: "backspace",

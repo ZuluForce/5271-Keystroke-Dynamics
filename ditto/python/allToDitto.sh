@@ -3,6 +3,9 @@
 function copyToBin() {
   echo "Copying generated profiles to the ditto bin"
   cp -v data/partitions/main/*.ditto ../bin
+
+  mkdir ../bin/scaled
+  cp -v data/partitions/main_scaled/*.ditto ../bin/scaled/
 }
 
 DO_REDUCE=1

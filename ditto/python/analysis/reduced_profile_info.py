@@ -19,7 +19,11 @@ def printReducedProfileInfo(*profiles):
         all_data = js.load_json(profile)
 
         pdata = all_data
+        wpm = 0
         if 'text' in all_data:
+            if 'wpm' in pdata:
+                wpm = pdata['wpm']
+
             pdata = all_data['text']
         
         fly_total_float = 0.0
@@ -54,6 +58,8 @@ def printReducedProfileInfo(*profiles):
         print("Standard Dev. fly time: {} ms".format(pdata['fly_stdv']))
         print("Mean press time: {} ms".format(pdata['press_mean']))
         print("Standard Dev. press time: {} ms".format(pdata['press_stdv']))
+        if wpm > 0:
+            print("Words Per Minute: {}".format(wpm))
         print("Max fly time from {} -> {} = {} ms".format(max_fly_from, max_fly_to, max_fly))
         print("Recalculated mean fly: {} ms".format(fly_total / num_fly))
         print("Recalculated mean fly (float): {} ms".format(fly_total_float / num_fly))

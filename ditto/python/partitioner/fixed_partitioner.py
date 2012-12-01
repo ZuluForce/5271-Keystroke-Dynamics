@@ -8,7 +8,7 @@ class FixedPartitioner(AbstractPartitioner):
         self.lowestPartitionNum = 2
         
         self.slidingPartitions = nonfixed
-        self.slidingWPM = [25, 40, 55, 65, 75, 85, 95, 100, 105, 110, 115, 120]
+        self.slidingWPM = [25, 40, 55, 65, 75, 85, 95, 100, 105, 108, 115, 120]
 
 
     def partitionProfiles(self, profiles):
