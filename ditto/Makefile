@@ -7,7 +7,7 @@ LIBDIR=lib
 BINDIR=bin
 
 INTERCEPT_LIB=interception
-CFLAGS=-O1 -std=c++0x -Wall
+CFLAGS=-O3 -std=c++0x -Wall
 LFLAGS=-lboost_system -lboost_thread -lboost_chrono
 
 EXPORT_FLAG=-W1,--export-dynamic

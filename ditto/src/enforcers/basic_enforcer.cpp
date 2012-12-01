@@ -9,17 +9,22 @@ BasicProfileEnforcer::BasicProfileEnforcer() {
 }
 
 
+/**
+ * The dispatcher grabs strokes from the queue and releases them according to the profile.
+ * It delays both for key press times and fly times.
+ */
 void BasicProfileEnforcer::dispatcher() {
 	std::cout << "\nBasicProfileEnforcer dispatchReceiver started\n" << std::endl;
 
 	ChronoStopwatch watch = ChronoStopwatch();
 	PendingStroke* pStroke = NULL;
+	PendingStroke* nextStroke = NULL;
 	InterceptionKeyStroke stroke;
 
 	KeyDownHist kd_hist;
 	std::map<KDProfileKey, KeyDownHist>::iterator kd_hist_it;
 
-	ChronoClockPoint lapPoint, lastKeyDown;
+	ChronoClockPoint lapPoint, lastKeyDown, nextIterationTime, peekAheadTime;
 	lastKeyDown = ChronoClock::now();
 
 	ChronoMicroDuration lapDuration, flyTime, pressTime, sleepTime, heldKeyTime;
@@ -28,6 +33,7 @@ void BasicProfileEnforcer::dispatcher() {
 
 	bool firstStroke = true;
 	bool lastStrokeDown = true;
+	bool setToThisDispatchTime;
 
 	// Used to print out the actual time it took for the fly
 	int delayTime = 0; // in ms
@@ -60,6 +66,53 @@ void BasicProfileEnforcer::dispatcher() {
 			sleepTime = flyTime - sleepTime; // How long we should sleep to satisfy the profile
 
 			if (sleepTime.count() > 0) {
+                // peek a the next time to see if this sleeptime may cause
+                // us to be behind schedule on the next one. If so, change the delay.
+                nextStroke = this->peekNextDispatch();
+                if (nextStroke != NULL) {
+                    // We are only concerned about press times which may come between
+                    // this key down and the next
+                    if (nextStroke->stroke.state == INTERCEPTION_KEY_UP) {
+                        kd_hist_it = dispatchDownHist.find(nextStroke->stroke.code);
+                        if (kd_hist_it == dispatchDownHist.end()) {
+                            if (nextStroke->stroke.code == stroke.code) {
+                                setToThisDispatchTime = true;
+                            } else {
+                                std::cerr << "(peekAhead): Received key up stroke with no previous corresponding key down" << std::endl;
+                                std::cerr << "Peeked Stroke = " << nextStroke->stroke.code << std::endl;
+                                std::cerr << "Current keydown stroke = " << stroke.code << std::endl;
+                                exit(2);
+                            }
+                        } else {
+                            kd_hist = kd_hist_it->second;
+                        }
+
+                        // How long is the press time for the keyup that will run next?
+                        pressTime = this->profileRef->getPressTime(nextStroke->stroke.code);
+
+                        // When will the next iteration run after we sleep?
+                        nextIterationTime = lapPoint + sleepTime;
+
+                        // In the case were the next keyup is for the current keydown we are processing
+                        if (setToThisDispatchTime) {
+                            kd_hist.kd_dispatch_time == nextIterationTime;
+                        }
+
+                        // What time will the keyup need to go in order to be on time
+                        peekAheadTime =  kd_hist.kd_dispatch_time + pressTime;
+
+                        if (peekAheadTime < nextIterationTime) {
+                            ChronoMicroDuration difference = nextIterationTime - peekAheadTime;
+
+                            // Split the difference of this duration between this stroke and the next
+                            difference /= 2;
+                            sleepTime -= difference;
+
+                            std::cout << "(peekAhead press): Making up time" << std::endl;
+                        }
+                    }
+                }
+
 				boost::this_thread::sleep(boost::posix_time::microseconds(sleepTime.count()));
 			}
 			interception_send(context, device, (InterceptionStroke *) &(stroke), 1);
@@ -79,6 +132,7 @@ void BasicProfileEnforcer::dispatcher() {
 			}
 
 			free(pStroke);
+			setToThisDispatchTime = false;
 			lastStrokeDown = true;
 
 			delayTime = (lastKeyDown - lapPoint).count();
@@ -105,6 +159,34 @@ void BasicProfileEnforcer::dispatcher() {
 			sleepTime = pressTime - (lapPoint - kd_hist.kd_dispatch_time);
 
 			if (sleepTime.count() > 0) {
+			    // peek a the next time to see if this sleeptime may cause
+                // us to be behind schedule on the next one. If so, change the delay.
+                nextStroke = this->peekNextDispatch();
+                if (nextStroke != NULL) {
+                    // We are only concerned about press times which may come between
+                    // this key down and the next
+                    if (nextStroke->stroke.state == INTERCEPTION_KEY_DOWN) {
+                        // How long is the fly time for the keydown that will run next?
+                        flyTime = this->profileRef->getFlyTime(current_key, nextStroke->stroke.code);
+
+                        // When will the next iteration run after we sleep?
+                        nextIterationTime = lapPoint + sleepTime;
+
+                        // What time will the keyup need to go in order to be on time
+                        peekAheadTime =  lastKeyDown + pressTime;
+
+                        if (peekAheadTime < nextIterationTime) {
+                            ChronoMicroDuration difference = nextIterationTime - peekAheadTime;
+
+                            // Split the difference of this duration between this stroke and the next
+                            difference /= 2;
+                            sleepTime -= difference;
+
+                            std::cout << "(peekAhead fly): Making up time" << std::endl;
+                        }
+                    }
+                }
+
 				boost::this_thread::sleep(boost::posix_time::microseconds(sleepTime.count()));
 			}
 
@@ -198,4 +280,16 @@ PendingStroke* BasicProfileEnforcer::getFromDispatch() {
 	dq_mutex.unlock();
 
 	return stroke;
+}
+
+PendingStroke* BasicProfileEnforcer::peekNextDispatch() {
+    dq_mutex.lock();
+    if (dispatchQueue.size() == 0) {
+        dq_mutex.unlock();
+        return NULL;
+    }
+    PendingStroke* stroke = dispatchQueue.front();
+
+    dq_mutex.unlock();
+    return stroke;
 }

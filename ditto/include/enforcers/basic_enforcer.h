@@ -51,6 +51,7 @@ private:
 	void dispatcher();
 	void addToDispatch(PendingStroke*);
 	PendingStroke* getFromDispatch();
+	PendingStroke* peekNextDispatch();
 
 	// Some shared state for the capture and dispatch
 	InterceptionContext context;
