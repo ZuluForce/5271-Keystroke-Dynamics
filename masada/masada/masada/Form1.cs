@@ -14,7 +14,7 @@ namespace masada
 {
     public partial class Form1 : Form
     {
-        /* Variable for the timer value */
+        /* Variable for the timer value (milliseconds) */
         private uint ticks;
 
         private uint keyDown, keyUp, keyPress;
@@ -203,15 +203,22 @@ namespace masada
 
         private void passwordTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            keyUp = ticks;
-
-            records.Add(new keyRecord(e.KeyValue, keyDown, keyUp));
-            numRecords++;
-
-            if ((numRecords % SEND_INTERVAL) == 0)
+            if (e.KeyCode == Keys.Enter)
             {
-                //Code for sending data...
-                MessageBox.Show("Sending data...");
+                // Do not do anything for enter key. Has to be a better way to do this.
+            }
+            else
+            {
+                keyUp = ticks;
+
+                records.Add(new keyRecord(e.KeyValue, keyDown, keyUp));
+                numRecords++;
+
+                if ((numRecords % SEND_INTERVAL) == 0)
+                {
+                    //Code for sending data...
+                    MessageBox.Show("Sending data...");
+                }
             }
         }
 
