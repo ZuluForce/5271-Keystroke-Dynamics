@@ -15,6 +15,33 @@ namespace masada
 
         // Global Values
 
+        /* Variable for the timer value. (milliseconds) */
+        private uint ticks;
+
+        private uint keyDown, keyUp, keyPress;
+
+        /* Number of keystroke records */
+        private int numRecords = 0;
+
+        /* How often the data is sent for processing */
+        private int SEND_INTERVAL = 25;
+
+        /* Object for storing keystroke data */
+        public struct keyRecord
+        {
+            public int Key;
+            public uint DownTime;
+            public uint UpTime;
+            public keyRecord(int key, uint downTime, uint upTime)
+            {
+                Key = key;
+                DownTime = downTime;
+                UpTime = upTime;
+            }
+        }
+
+        List<keyRecord> records = new List<keyRecord>();
+
         // this is currently in seconds, probably will change to some other format when needed (2000.0 = 2 seconds)
         double maxFilterTime = 2.0;
 
@@ -22,6 +49,7 @@ namespace masada
         {
             InitializeComponent();
             typingBoxText.Text = "Feel free to type, it will not be saved...";
+            timer1.Start();
         }
 
         public Form RefToForm1 { get; set; }
@@ -41,12 +69,21 @@ namespace masada
 
         private void typingBoxText_KeyDown(object sender, KeyEventArgs e)
         {
-            //MessageBox.Show("Key: " + e.KeyValue + " pressed down", "Key Down", MessageBoxButtons.OK);
+            keyDown = ticks;
         }
 
         private void typingBoxText_KeyUp(object sender, KeyEventArgs e)
         {
-            //MessageBox.Show("Key: " + e.ToString() + " released", "Key Up", MessageBoxButtons.OK);
+            keyUp = ticks;
+
+            records.Add(new keyRecord(e.KeyValue, keyDown, keyUp));
+            numRecords++;
+
+            if ((numRecords % SEND_INTERVAL) == 0)
+            {
+                //Code for sending data...
+                MessageBox.Show("Sending data...");
+            }
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -61,7 +98,7 @@ namespace masada
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void label1_Click_1(object sender, EventArgs e)
@@ -72,11 +109,11 @@ namespace masada
         /*
          * Calculates the distance between two n x 1 vectors.
          */
-        private double Mahalanobis(Matrix profileData, Matrix collectedData) 
+        private double Mahalanobis(Matrix profileData, Matrix collectedData)
         {
             // Average of the profile data
             double meanProfileData = calculateMean(profileData);
-            
+
             // Average of the collected data
             double meanCollectedData = calculateMean(collectedData);
 
@@ -89,7 +126,7 @@ namespace masada
             double covM = matrixCov(B);
 
             // Calculates the distance (before taking the square root)
-            Matrix result = Matrix.Transpose(profileData - collectedData) * ((1/covM) * (profileData - collectedData));
+            Matrix result = Matrix.Transpose(profileData - collectedData) * ((1 / covM) * (profileData - collectedData));
 
             // Final distance
             double retVal = Math.Sqrt(result[0, 0]);
@@ -133,11 +170,11 @@ namespace masada
 
             List<double> filter = new List<double>();
 
-            foreach (double d in data) 
+            foreach (double d in data)
             {
                 if (d <= maxFilterTime)
                     filter.Add(d);
-                           
+
             }
 
             return filter.ToArray();
@@ -150,13 +187,13 @@ namespace masada
             List<double> outer = new List<double>();
             List<double> inner = new List<double>();
 
-            for (int i = 0; i < data.GetLength(0); i++) 
+            for (int i = 0; i < data.GetLength(0); i++)
             {
                 if (data[i, 1] <= maxFilterTime)
                 {
                     outer.Add(data[i, 0]);
                     inner.Add(data[i, 1]);
-                }                 
+                }
             }
 
             double[,] filteredVals = new double[outer.Count, inner.Count];
@@ -166,14 +203,14 @@ namespace masada
                 filteredVals[i, 0] = outer.ElementAt(i);
                 filteredVals[i, 1] = inner.ElementAt(i);
             }
-            
+
             return filteredVals;
         }
 
 
         private void testFilterTimes(object sender, EventArgs e)
         {
-            double[] test1 = new double[] {1.0, 2.0, 1.5, 3.0};
+            double[] test1 = new double[] { 1.0, 2.0, 1.5, 3.0 };
             System.Diagnostics.Debug.WriteLine("Test a single array:");
             System.Diagnostics.Debug.WriteLine(string.Join(",", test1));
 
@@ -187,7 +224,7 @@ namespace masada
             System.Diagnostics.Debug.WriteLine("Test a 2D array:");
             for (int i = 0; i < test2.GetLength(0); i++)
             {
-                System.Diagnostics.Debug.WriteLine(test2[i,0] + ", " + test2[i, 1]);
+                System.Diagnostics.Debug.WriteLine(test2[i, 0] + ", " + test2[i, 1]);
             }
 
             test2 = FilterTimes(test2);
@@ -200,8 +237,8 @@ namespace masada
 
             Matrix a = new Matrix(4, 1);
             Matrix b = new Matrix(4, 1);
-            a.mat[0,0] = 1;
-            a.mat[1,0] = 2;
+            a.mat[0, 0] = 1;
+            a.mat[1, 0] = 2;
             a.mat[2, 0] = 3;
             a.mat[3, 0] = 4;
             b.mat[0, 0] = 1.2;
@@ -222,6 +259,11 @@ namespace masada
             }
 
             return retVal;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            ticks++;
         }
     }
 }

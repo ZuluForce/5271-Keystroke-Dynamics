@@ -14,18 +14,46 @@ namespace masada
 {
     public partial class Form1 : Form
     {
+        /* Variable for the timer value (milliseconds) */
+        private uint ticks;
+
+        private uint keyDown, keyUp, keyPress;
+
+        /* Number of keystroke records */
+        private int numRecords = 0;
+
+        /* How often the data is sent for processing */
+        private int SEND_INTERVAL = 25;
+
+        /* Object for storing keystroke data */
+        public struct keyRecord
+        {
+            public int Key;
+            public uint DownTime;
+            public uint UpTime;
+            public keyRecord(int key, uint downTime, uint upTime)
+            {
+                Key = key;
+                DownTime = downTime;
+                UpTime = upTime;
+            }
+        }
+
+        List<keyRecord> records = new List<keyRecord>();
+
         public Form1()
         {
             InitializeComponent();
             passwordTextBox.Text = "";
             passwordTextBox.PasswordChar = '*';
+            timer1.Start();
         }
 
         private void logingButton_Click(object sender, EventArgs e)
         {
             if (checkUser(usernameTextBox.Text, passwordTextBox.Text))
             {
-               // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
+                // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
                 Form2 form2 = new Form2();
                 form2.RefToForm1 = this;
                 form2.Show();
@@ -132,7 +160,7 @@ namespace masada
 
         private string[] openLoginFile()
         {
-            if ( !File.Exists(Directory.GetCurrentDirectory() + "\\login.txt") )
+            if (!File.Exists(Directory.GetCurrentDirectory() + "\\login.txt"))
             {
                 FileStream fs = File.Create(Directory.GetCurrentDirectory() + "\\login.txt");
                 fs.Close();
@@ -155,15 +183,49 @@ namespace masada
             }
         }
 
-        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+
+        private void passwordTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            
-             if (e.KeyChar == (char) 13)
+
+        }
+
+        private void passwordTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
             {
                 logingButton_Click();
             }
-            
+            else
+            {
+                keyDown = ticks;
+            }
         }
- 
+
+        private void passwordTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                // Do not do anything for enter key. Has to be a better way to do this.
+            }
+            else
+            {
+                keyUp = ticks;
+
+                records.Add(new keyRecord(e.KeyValue, keyDown, keyUp));
+                numRecords++;
+
+                if ((numRecords % SEND_INTERVAL) == 0)
+                {
+                    //Code for sending data...
+                    MessageBox.Show("Sending data...");
+                }
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            ticks++;
+        }
+
     }
 }
