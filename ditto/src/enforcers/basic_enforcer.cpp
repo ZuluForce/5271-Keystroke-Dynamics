@@ -2,12 +2,61 @@
 
 
 // Should at some point setup ditto with a way to test this
-const ChronoMicroDuration BasicProfileEnforcer::ditto_overhead = ChronoMicroDuration(50); // 50 microseconds
+const ChronoMicroDuration BasicProfileEnforcer::ditto_overhead = ChronoMicroDuration(40); // 40 microseconds
 
 BasicProfileEnforcer::BasicProfileEnforcer() {
+    looseStrokes = false;
 	return;
 }
 
+void BasicProfileEnforcer::setLooseStrokes(bool state) {
+    this->looseStrokes = state;
+}
+
+/**
+ * This is only used with loose key strokes is enabled. It allows
+ * us to delay a key up event while a key down is occurring in the
+ * regular dispatcher.
+ */
+void BasicProfileEnforcer::delayedUpDispatch() {
+    std::cout << "\n---- Delayed Key Up Dispatcher Started ----\n" << std::endl;
+
+    KeyUpDelay* delayStroke;
+    KDProfileKey key;
+
+    ChronoMicroDuration pressTime, durSinceKD, sleepTime;
+
+    long actualTime = 0;
+
+    while (true) {
+        delayStroke = this->getFromDelayDispatch();
+
+        key = delayStroke->stroke.code;
+        if (delayStroke->stroke.state != INTERCEPTION_KEY_UP) {
+            std::cerr << "delayedUpDispatch received non key up stroke" << std::endl;
+            exit(2);
+        }
+
+        pressTime = this->profileRef->getPressTime(key);
+        durSinceKD = ChronoClock::now() - delayStroke->kd_dispatch_time;
+
+        sleepTime = pressTime - durSinceKD;
+
+        if (sleepTime.count() > 0) {
+            boost::this_thread::sleep(boost::posix_time::microseconds(sleepTime.count()));
+        }
+
+        interception_send(context, device, (InterceptionStroke *) &(delayStroke->stroke), 1);
+
+        actualTime = (ChronoClock::now() - delayStroke->kd_dispatch_time).count();
+        actualTime = actualTime / 1000;
+
+        free(delayStroke);
+
+        std::cout << "<UP Loose(" << key << ")> time: " << actualTime;
+        std::cout << " ms (profile: " << pressTime.count() / 1000 << " ms)" << std::endl;
+    }
+}
 
 /**
  * The dispatcher grabs strokes from the queue and releases them according to the profile.
@@ -15,6 +64,13 @@ BasicProfileEnforcer::BasicProfileEnforcer() {
  */
 void BasicProfileEnforcer::dispatcher() {
 	std::cout << "\nBasicProfileEnforcer dispatchReceiver started\n" << std::endl;
+
+    // Create dispatch thread
+	boost::thread* delayUpThread;
+	KeyUpDelay* delayStruct;
+	if (this->looseStrokes) {
+        delayUpThread = new boost::thread(boost::bind(&BasicProfileEnforcer::delayedUpDispatch, this));
+	}
 
 	ChronoStopwatch watch = ChronoStopwatch();
 	PendingStroke* pStroke = NULL;
@@ -27,7 +83,7 @@ void BasicProfileEnforcer::dispatcher() {
 	ChronoClockPoint lapPoint, lastKeyDown, nextIterationTime, peekAheadTime;
 	lastKeyDown = ChronoClock::now();
 
-	ChronoMicroDuration lapDuration, flyTime, pressTime, sleepTime, heldKeyTime;
+	ChronoMicroDuration lapDuration, flyTime, pressTime, sleepTime, heldKeyTime, nextStrokeDur;
 	heldKeyTime = ChronoStopwatch::durationFromMicro(HELD_KEY_INTERVAL);
 	KDProfileKey current_key = SCANCODE_A;
 
@@ -36,7 +92,7 @@ void BasicProfileEnforcer::dispatcher() {
 	bool setToThisDispatchTime;
 
 	// Used to print out the actual time it took for the fly
-	int delayTime = 0; // in ms
+	long actualTime = 0; // in ms
 
 	watch.start();
 	while (true) {
@@ -101,14 +157,19 @@ void BasicProfileEnforcer::dispatcher() {
                         // What time will the keyup need to go in order to be on time
                         peekAheadTime =  kd_hist.kd_dispatch_time + pressTime;
 
-                        if (peekAheadTime < nextIterationTime) {
+                        if (peekAheadTime < nextIterationTime && !this->looseStrokes) {
                             ChronoMicroDuration difference = nextIterationTime - peekAheadTime;
 
                             // Split the difference of this duration between this stroke and the next
                             difference /= 2;
-                            sleepTime -= difference;
+                            if (difference.count() > MAX_FLY_SPLIT) {
+                                std::cout << "Time Difference " << difference.count() / 1000;
+                                std::cout << " ms is too much to make up" << std::endl;
+                            } else {
+                                sleepTime -= difference;
 
-                            std::cout << "(peekAhead press): Making up time" << std::endl;
+                                std::cout << "(peekAhead press): Making up time" << std::endl;
+                            }
                         }
                     }
                 }
@@ -118,6 +179,9 @@ void BasicProfileEnforcer::dispatcher() {
 			interception_send(context, device, (InterceptionStroke *) &(stroke), 1);
 
 			kd_hist.kd_dispatch_time = watch.now();
+
+            // The actual time for the key fly. This is what we will put out to the console.
+			actualTime = (kd_hist.kd_dispatch_time - lastKeyDown).count() / 1000;
 			lastKeyDown = kd_hist.kd_dispatch_time;
 
 			current_key = stroke.code;
@@ -135,9 +199,8 @@ void BasicProfileEnforcer::dispatcher() {
 			setToThisDispatchTime = false;
 			lastStrokeDown = true;
 
-			delayTime = (lastKeyDown - lapPoint).count();
-			delayTime = delayTime / 1000; // to get ms
-			std::cout << "<DOWN(" << stroke.code << ")> delayed: " << delayTime << " ms" << std::endl;
+			std::cout << "<DOWN(" << stroke.code << ")> time: " << actualTime;
+			std::cout << " ms (profile: " << flyTime.count() / 1000 << " ms)" << std::endl;
 		} else if (stroke.state == INTERCEPTION_KEY_UP) {
 			if (firstStroke && stroke.code == SCANCODE_RTRN) {
 				firstStroke = false;
@@ -152,6 +215,7 @@ void BasicProfileEnforcer::dispatcher() {
 				std::cerr << "Received key up stroke with no previous corresponding key down" << std::endl;
 				exit(-1);
 			}
+
 			// This holds the time the corresponding keydown was sent out
 			kd_hist = kd_hist_it->second;
 
@@ -159,48 +223,69 @@ void BasicProfileEnforcer::dispatcher() {
 			sleepTime = pressTime - (lapPoint - kd_hist.kd_dispatch_time);
 
 			if (sleepTime.count() > 0) {
-			    // peek a the next time to see if this sleeptime may cause
-                // us to be behind schedule on the next one. If so, change the delay.
                 nextStroke = this->peekNextDispatch();
                 if (nextStroke != NULL) {
                     // We are only concerned about press times which may come between
                     // this key down and the next
                     if (nextStroke->stroke.state == INTERCEPTION_KEY_DOWN) {
                         // How long is the fly time for the keydown that will run next?
-                        flyTime = this->profileRef->getFlyTime(current_key, nextStroke->stroke.code);
+                        //flyTime = this->profileRef->getFlyTime(current_key, nextStroke->stroke.code);
+                        nextStrokeDur = this->profileRef->getFlyTime(current_key, nextStroke->stroke.code);
+                    } else {
+                        nextStrokeDur = this->profileRef->getPressTime(nextStroke->stroke.code);
+                    }
 
-                        // When will the next iteration run after we sleep?
-                        nextIterationTime = lapPoint + sleepTime;
+                    // When will the next iteration run after we sleep?
+                    nextIterationTime = lapPoint + sleepTime;
 
-                        // What time will the keyup need to go in order to be on time
-                        peekAheadTime =  lastKeyDown + pressTime;
+                    // What time will the keyup need to go in order to be on time
+                    peekAheadTime =  lastKeyDown + nextStrokeDur;
 
-                        if (peekAheadTime < nextIterationTime) {
+                    //std::cout << "Peak ahead difference = " << (peekAheadTime - nextIterationTime).count() << std::endl;
+                    if (peekAheadTime < nextIterationTime) {
+                        if (this->looseStrokes && this->profileRef->canLoosenKey(stroke.code)) {
+                            // Break this keyup away from this loop.
+                            delayStruct = (KeyUpDelay*) malloc(sizeof(KeyUpDelay));
+                            delayStruct->stroke = stroke;
+                            delayStruct->kd_dispatch_time = kd_hist.kd_dispatch_time;
+
+                            this->addToDelayDispatch(delayStruct);
+
+                            dispatchDownHist.erase(kd_hist_it);
+                            free(pStroke);
+                            lastStrokeDown = false;
+                            continue;
+                        } else {
                             ChronoMicroDuration difference = nextIterationTime - peekAheadTime;
 
                             // Split the difference of this duration between this stroke and the next
                             difference /= 2;
-                            sleepTime -= difference;
 
-                            std::cout << "(peekAhead fly): Making up time" << std::endl;
+                            if (difference.count() > MAX_PRESS_SPLIT) {
+                                std::cout << "Time difference " << difference.count();
+                                std::cout << " ms is too much to make up" << std::endl;
+                            } else {
+                                sleepTime -= difference;
+                                std::cout << "(peekAhead fly): Making up time" << std::endl;
+                            }
                         }
                     }
                 }
-
 				boost::this_thread::sleep(boost::posix_time::microseconds(sleepTime.count()));
 			}
 
 			interception_send(context, device, (InterceptionStroke *) &(stroke), 1);
 
+            // The actual time the press took. This will go out to the terminal
+            actualTime = (watch.now() - kd_hist.kd_dispatch_time).count() / 1000;
 			dispatchDownHist.erase(kd_hist_it);
 			free(pStroke);
 
 			// Used in detecting a held key
 			lastStrokeDown = false;
 
-			delayTime = (watch.now() - lapPoint).count();
-			delayTime = delayTime / 1000;  // get the time in ms
-			std::cout << "<UP(" << stroke.code << ")> delay: " << delayTime << " ms" << std::endl;
+			std::cout << "<UP(" << stroke.code << ")> time: " << actualTime;
+			std::cout << " ms (profile: " << pressTime.count() / 1000 << " ms)" << std::endl;
 		} else {
 			std::cerr << "dispatcher received stroke for unknown state (UP/DOWN)" << std::endl;
 			exit(-1);
@@ -264,10 +349,19 @@ void BasicProfileEnforcer::enforce(KDProfile& profile) {
 void BasicProfileEnforcer::addToDispatch(PendingStroke* stroke) {
 	dq_mutex.lock();
 	dispatchQueue.push(stroke);
-	stroke = dispatchQueue.back();
+	//stroke = dispatchQueue.back();
 	dq_mutex.unlock();
 
 	dq_sem.notify();
+}
+
+void BasicProfileEnforcer::addToDelayDispatch(KeyUpDelay* stroke) {
+	delay_mutex.lock();
+	delayUpQueue.push(stroke);
+	//stroke = delayUpQueue.back();
+	delay_mutex.unlock();
+
+	delay_sem.notify();
 }
 
 PendingStroke* BasicProfileEnforcer::getFromDispatch() {
@@ -278,6 +372,18 @@ PendingStroke* BasicProfileEnforcer::getFromDispatch() {
 	dispatchQueue.pop();
 
 	dq_mutex.unlock();
+
+	return stroke;
+}
+
+KeyUpDelay* BasicProfileEnforcer::getFromDelayDispatch() {
+	delay_sem.wait();
+	delay_mutex.lock();
+
+	KeyUpDelay* stroke = delayUpQueue.front();
+	delayUpQueue.pop();
+
+	delay_mutex.unlock();
 
 	return stroke;
 }

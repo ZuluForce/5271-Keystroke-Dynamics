@@ -37,6 +37,8 @@ void KDProfile::addFlyTime(uint32_t from, uint32_t to, int64_t ftime) {
 		fastest_to = to;
 	}
 
+	ftime -= UNIFORM_TIME_OFFSET;
+
     ++num_flytimes;
 	total_flytimes += ftime;
 
@@ -46,6 +48,8 @@ void KDProfile::addFlyTime(uint32_t from, uint32_t to, int64_t ftime) {
 
 void KDProfile::addPressTime(uint32_t key, int64_t ptime) {
 	this->ensurePressVectorSize(key);
+
+    ptime -= UNIFORM_TIME_OFFSET;
 
     ++num_presstimes;
     total_presstimes += ptime;
@@ -73,6 +77,12 @@ int64_t KDProfile::getAverageFlyTimeMs() {
 
 int64_t KDProfile::getAveragePressTimeMs() {
     return (total_presstimes / num_presstimes) / 1000;
+}
+
+bool KDProfile::canLoosenKey(KDProfileKey key) {
+    // For right now we only make the shift key bound to strict
+    // ordering. Later this could include ctrl, alt or others
+    return key != 0x2A;
 }
 
 KDProfileID::KDProfileID(std::string name)

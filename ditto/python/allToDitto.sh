@@ -10,6 +10,7 @@ function copyToBin() {
 
 DO_REDUCE=1
 DO_PARTITION=1
+DO_DEPLOY=0
 
 for var in "$@"
 do
@@ -24,6 +25,10 @@ do
 
   if [[ $var == "no-partition" ]]; then
     DO_PARTITION=0
+  fi
+
+  if [[ $var == "deploy" ]]; then
+    DO_DEPLOY=1
   fi
 done
 
@@ -77,6 +82,6 @@ fi
 python analysis/partition_set_info.py data/partitions/main
 python analysis/partition_set_info.py data/partitions/main_scaled
 
-if [[ $# -gt 0 && $1 == "deploy" ]]; then
+if [[ DO_DEPLOY -eq 1 ]]; then
   copyToBin
 fi

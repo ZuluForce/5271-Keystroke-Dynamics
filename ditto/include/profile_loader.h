@@ -7,6 +7,13 @@
 #include <iostream>
 #include "util/timer.h"
 
+/*
+ * This offset will be subtracted from every time. This is due to a combination
+ * of the innacuracy of the incoming profiles (a tendency to be too high) and
+ * some of the vaiability in ditto
+ */
+#define UNIFORM_TIME_OFFSET 0  // in ms
+
 // Since ditto will likely have to support loading profiles from multiple
 // places I am creating an abstract base class as an interface
 
@@ -45,6 +52,8 @@ public:
 
 	int64_t getAverageFlyTimeMs();
 	int64_t getAveragePressTimeMs();
+
+	bool canLoosenKey(KDProfileKey key);
 };
 
 class KDProfileID {

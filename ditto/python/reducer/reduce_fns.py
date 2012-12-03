@@ -141,7 +141,6 @@ def reduceTimes(timeData):
     press_time_keys = []
 
     # Mean and std deviation for fly times
-    print("Processing raw fly times")
     for from_key, to_keys in timeData['fly_times'].items():
         from_key = int(from_key)
         reduced_profile['fly_times'][from_key] = {}
@@ -164,7 +163,6 @@ def reduceTimes(timeData):
             fly_time_pairs.append((from_key, to_key))
 
     # Mean and std deviation for press times
-    print("Processing raw press times")
     for key, times in timeData['press_times'].items():
         key = int(key)
 

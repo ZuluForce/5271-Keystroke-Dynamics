@@ -10,6 +10,7 @@ import sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,parentdir)
 import util.json_handler as js
+from mappings.scan_code_maps import getCharFromJSCode
 
 def printReducedProfileInfo(*profiles):
     for profile in profiles:
@@ -61,6 +62,7 @@ def printReducedProfileInfo(*profiles):
         if wpm > 0:
             print("Words Per Minute: {}".format(wpm))
         print("Max fly time from {} -> {} = {} ms".format(max_fly_from, max_fly_to, max_fly))
+        print("Max fly time as char {} -> {}".format(getCharFromJSCode(max_fly_from), getCharFromJSCode(max_fly_to)))
         print("Recalculated mean fly: {} ms".format(fly_total / num_fly))
         print("Recalculated mean fly (float): {} ms".format(fly_total_float / num_fly))
 

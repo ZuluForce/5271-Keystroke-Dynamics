@@ -10,6 +10,7 @@ void printUsage(char* progName) {
 void initializeOptionStruct(DittoOptions* options) {
 	options->profileType = NULL;
 	options->profileInfo = NULL;
+	options->looseStrokes = false;
 
 	options->initialized = true;
 }
@@ -31,6 +32,9 @@ int readFlagValue(char** dst, char* src, int flagLen) {
 
 	size_t len = strlen(src);
 	len -= (flagLen-1);
+	if (len <= 1)
+        return 1; // Means there was nothing
+
 	*dst = (char*) malloc(len);
 
 	strncpy(*dst, src+(flagLen), len);
@@ -69,10 +73,20 @@ DittoOptions* parseCmdLine(int argc, char* argv[]) {
         	}
 			status = readFlagValue(&options->profileInfo, argv[i], 2);
 			if (status) {
-				std::cerr << "Error copying flag argument value" << std::endl;
-				printUsage(argv[0]);
-				exit(-1);
+			    if (i+1 < argc) {
+                    status = readFlagValue(&options->profileInfo, argv[i+1], 0);
+			    }
+
+			    if (status) {
+                    std::cerr << "Error copying flag argument value" << std::endl;
+                    printUsage(argv[0]);
+                    exit(1);
+			    } else {
+                    ++i;
+			    }
 			}
+        } else if (strncmp(argv[i], "--loose", 7) == 0) {
+            options->looseStrokes = true;
         } else {
         	std::cerr << "Unknown argument: " << argv[i] << std::endl;
         	printUsage(argv[0]);
@@ -120,6 +134,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Ditto Options: " << std::endl;
 	std::cout << "\tProfile Type: " << options->profileType << std::endl;
 	std::cout << "\tProfile Info: " << options->profileInfo << std::endl;
+	std::cout << "\tLoose Stroke Ordering: " << options->looseStrokes << std::endl;
 
 	// Get the profile loader
 	DittoProfileLoader* loader = getProfileLoader(options->profileType, options->profileInfo);
@@ -139,6 +154,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	BasicProfileEnforcer enforcer;
+	enforcer.setLooseStrokes(options->looseStrokes);
 	enforcer.enforce(profile);
 
     return 0;

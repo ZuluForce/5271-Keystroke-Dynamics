@@ -34,7 +34,11 @@ if __name__ == '__main__':
                     from_key = JSCodeFromDittoSC(struct.from_key)
                     to_key = JSCodeFromDittoSC(struct.to_key)
                     if print_all_times:
-                        print(" {:^2} -> {:^2} : {} ms".format(from_key, to_key, time))
+                        from_char = getCharFromDittoSC(from_key)
+                        to_char = getCharFromDittoSC(to_key)
+                        
+                        if from_char != "" and to_char != "":
+                            print(" {:^2} -> {:^2} : {} ms".format(from_char, to_char, time))
                         
                     if time > max_fly:
                         max_fly = time
@@ -44,7 +48,10 @@ if __name__ == '__main__':
                     total_fly_times.append(struct.time_in_ms)
                 elif struct.time_type == FSProfileTimeType.PRESS_TIME:
                     if print_all_times:
-                        print(" {0.from_key:^2} |> {0.to_key:^2} : {0.time_in_ms} ms".format(struct))
+                        key_char = getCharFromDittoSC(struct.from_key)
+                        if key_char != "":
+                            print(" {:^2} |> {} ms".format(key_char, struct.time_in_ms))
+
                     total_press_times.append(struct.time_in_ms)
                 else:
                     print("!! ---- Unrecognized FSProfileTimeType ( {} ) ---- !!".format(struct.time_type))

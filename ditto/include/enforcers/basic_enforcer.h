@@ -17,6 +17,11 @@
 
 #define HELD_KEY_INTERVAL 33000 // 33ms
 
+// If we are trying to catch up, this is the most time we
+// modify by, otherwise we are sol
+#define MAX_FLY_SPLIT 30000  // 30ms
+#define MAX_PRESS_SPLIT 15000  // 15ms
+
 struct PendingStroke {
 	InterceptionKeyStroke stroke;
 	ChronoMicroDuration wait_time;
@@ -27,6 +32,11 @@ struct KeyDownHist {
 	ChronoClockPoint kd_dispatch_time;
 };
 
+struct KeyUpDelay {
+    InterceptionKeyStroke stroke;
+    ChronoClockPoint kd_dispatch_time;
+};
+
 class BasicProfileEnforcer: public DittoProfileEnforcer {
 private:
 	// This is used to account for clock drift. This becomes more
@@ -34,6 +44,7 @@ private:
 	static const ChronoMicroDuration ditto_overhead;
 
 	boost::mutex dq_mutex;
+	boost::mutex delay_mutex;
 	boost::mutex interception_lock;
 
 	/* dq_Sem - dispatchQueue semaphore
@@ -41,7 +52,9 @@ private:
 	 * dd_sem - dispatchDown queue semaphore
 	 */
 	semaphore dq_sem;
+	semaphore delay_sem;
 	std::queue<PendingStroke*> dispatchQueue;
+	std::queue<KeyUpDelay*> delayUpQueue;
 	KDProfile* profileRef;
 
 	// This is necessary for the dispathReceiver to calcualte times
@@ -49,8 +62,11 @@ private:
 	std::map<KDProfileKey, KeyDownHist> dispatchDownHist;
 
 	void dispatcher();
+	void delayedUpDispatch();
 	void addToDispatch(PendingStroke*);
+	void addToDelayDispatch(KeyUpDelay*);
 	PendingStroke* getFromDispatch();
+	KeyUpDelay* getFromDelayDispatch();
 	PendingStroke* peekNextDispatch();
 
 	// Some shared state for the capture and dispatch
@@ -58,9 +74,12 @@ private:
 	InterceptionDevice device;
 	InterceptionKeyStroke kstroke;
 
+	bool looseStrokes;
+
 public:
 	BasicProfileEnforcer();
 
+    void setLooseStrokes(bool on);
 	void enforce(KDProfile&);
 };
 

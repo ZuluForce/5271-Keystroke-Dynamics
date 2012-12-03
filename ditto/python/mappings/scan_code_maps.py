@@ -120,12 +120,29 @@ DittoSCToChar = {
     0x28:  '\'',
 }
 
+def getCharFromDittoSC(dcode):
+    if dcode not in DittoSCToChar:
+        return ""
+    
+    return DittoSCToChar[dcode]
+
+def getCharFromJSCode(jscode):
+    if type(jscode) in (unicode, str):
+        jscode = int(jscode)
+    
+    dcode = DittoSCFromJSCode(jscode)
+    
+    return getCharFromDittoSC(dcode)
+
 def DittoSCFromJSCode(jscode):
     """
     Takes in a javascript key code and returns the scancode used to represent
     that key in ditto. If the given key is not mapped to a a ditto scancode, -1
     is returned.
     """
+    if type(jscode) in (unicode, str):
+        jscode = int(jscode)
+
     try:
         return JSCodeToDitto[jscode]
     except:
