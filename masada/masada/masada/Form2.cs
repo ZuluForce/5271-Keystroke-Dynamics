@@ -96,8 +96,11 @@ namespace masada
 
         private void typingBoxText_KeyDown(object sender, KeyEventArgs e)
         {
-            prevKeyUp = keyUpTime;
             keyDownTime = ticks;
+            if (keyRecords > 0)
+            {
+                prevKeyUp = keyUpTime;
+            }
         }
 
         private void typingBoxText_KeyUp(object sender, KeyEventArgs e)
@@ -129,7 +132,7 @@ namespace masada
                 // This is not going to work correctly. Some variables are not updated as they should be. Going to finish when I have more time.
                 secondKey = e.KeyValue;
                 secondKeyDown = keyDownTime;
-                firstKeyUp = keyUpTime;
+                firstKeyUp = prevKeyUp;
                 keyFlyTime = secondKeyDown - firstKeyUp;
                 if ((index = flyTimes.FindIndex(c => c.FirstKey == firstKey && c.SecondKey == secondKey)) > -1)
                 {
@@ -147,17 +150,6 @@ namespace masada
             {
                 firstKey = secondKey = e.KeyValue;
             }
-
-
-
-            ////pressTimes.Add(new keyPressTimes(e.KeyValue, (keyUp - keyDown)));
-            //pressRecords++;
-
-            //if ((pressRecords % SEND_INTERVAL) == 0)
-            //{
-            //    //Code for sending data...
-            //    MessageBox.Show("Sending data...");
-            //}
         }
 
         private void Form2_Load(object sender, EventArgs e)
