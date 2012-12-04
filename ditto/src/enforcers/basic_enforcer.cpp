@@ -161,7 +161,6 @@ void BasicProfileEnforcer::dispatcher() {
 
                         if (peekAheadTime < nextIterationTime) {
                             if (this->looseStrokes && !setToThisDispatchTime) {
-                                std::cout << "--------------------- Sending key up to delay queue ----------------------" << std::endl;
                                 // the next keyup is not for this keydown and we are allowed to interleave keys
                                 delayStruct = (KeyUpDelay*) malloc(sizeof(KeyUpDelay));
                                 delayStruct->stroke = nextStroke->stroke;
