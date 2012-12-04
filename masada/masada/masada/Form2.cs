@@ -18,29 +18,47 @@ namespace masada
         /* Variable for the timer value. (milliseconds) */
         private uint ticks;
 
-        private uint keyDown, keyUp, keyPress;
+        private uint keyDownTime, keyUpTime, keyPressTime;
 
-        /* Number of keystroke records */
-        private int numRecords = 0;
+        private int firstKey, secondKey;
+
+        /* Number of recorded fly times */
+        private int flyRecords = 0;
+
+        /* Number of recorded press times */
+        private int pressRecords = 0;
 
         /* How often the data is sent for processing */
         private int SEND_INTERVAL = 25;
 
-        /* Object for storing keystroke data */
-        public struct keyRecord
+        /* Object for storing key press times */
+        public struct keyPressTimes
         {
             public int Key;
-            public uint DownTime;
-            public uint UpTime;
-            public keyRecord(int key, uint downTime, uint upTime)
+            public List<uint> KeyPress;
+            public keyPressTimes(int key, List<uint> keyPress)
             {
                 Key = key;
-                DownTime = downTime;
-                UpTime = upTime;
+                KeyPress = keyPress;
             }
         }
 
-        List<keyRecord> records = new List<keyRecord>();
+        List<keyPressTimes> pressTimes = new List<keyPressTimes>();
+
+        public struct keyFlyTimes
+        {
+            public int FirstKey;
+            public int SecondKey;
+            public List<uint> KeyFly;
+            public keyFlyTimes(int firstKey, int secondKey, List<uint> keyFly)
+            {
+                FirstKey = firstKey;
+                SecondKey = secondKey;
+                KeyFly = keyFly;
+            }
+        }
+
+        List<keyFlyTimes> flyTimes = new List<keyFlyTimes>();
 
         // this is currently in seconds, probably will change to some other format when needed (2000.0 = 2 seconds)
         double maxFilterTime = 2.0;
@@ -69,17 +87,35 @@ namespace masada
 
         private void typingBoxText_KeyDown(object sender, KeyEventArgs e)
         {
-            keyDown = ticks;
+            keyDownTime = ticks;
         }
 
         private void typingBoxText_KeyUp(object sender, KeyEventArgs e)
         {
-            keyUp = ticks;
+            keyUpTime = ticks;
+            int index;
+            keyPressTime = keyUpTime - keyDownTime;
 
-            records.Add(new keyRecord(e.KeyValue, keyDown, keyUp));
-            numRecords++;
+            if ((index = pressTimes.FindIndex(c => c.Key == e.KeyValue)) > 0)
+            {
+                // add time to that list
 
-            if ((numRecords % SEND_INTERVAL) == 0)
+
+            }
+            else
+            {
+                // make a new object
+                List<uint> temp = new List<uint>();
+                temp.Add(keyPressTime);
+                pressTimes.Add(new keyPressTimes(e.KeyValue, temp));
+            }
+
+
+
+            //pressTimes.Add(new keyPressTimes(e.KeyValue, (keyUp - keyDown)));
+            pressRecords++;
+
+            if ((pressRecords % SEND_INTERVAL) == 0)
             {
                 //Code for sending data...
                 MessageBox.Show("Sending data...");
