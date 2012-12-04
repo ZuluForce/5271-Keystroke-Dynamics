@@ -20,13 +20,20 @@ namespace masada
 
         private uint keyDownTime, keyUpTime, keyPressTime;
 
-        private int firstKey, secondKey;
+        private int firstKey = -1;
+        private int secondKey = -1;
+
+        private uint firstKeyUp;
+        private uint secondKeyDown;
+        private uint keyFlyTime;
 
         /* Number of recorded fly times */
         private int flyRecords = 0;
 
         /* Number of recorded press times */
         private int pressRecords = 0;
+
+        private int keyRecords = 0;
 
         /* How often the data is sent for processing */
         private int SEND_INTERVAL = 25;
@@ -93,16 +100,19 @@ namespace masada
         private void typingBoxText_KeyUp(object sender, KeyEventArgs e)
         {
             keyUpTime = ticks;
+            keyRecords++;
             int index;
             keyPressTime = keyUpTime - keyDownTime;
 
-            if ((index = pressTimes.FindIndex(c => c.Key == e.KeyValue)) > 0)
+            // if/else for key press times
+            // key exists in list, add press time to existing object's list
+            if ((index = pressTimes.FindIndex(c => c.Key == e.KeyValue)) > -1)
             {
                 // add time to that list
-
+                pressTimes[index].KeyPress.Add(keyPressTime);
 
             }
-            else
+            else // record for key does not exist. Create a new one.
             {
                 // make a new object
                 List<uint> temp = new List<uint>();
@@ -110,16 +120,41 @@ namespace masada
                 pressTimes.Add(new keyPressTimes(e.KeyValue, temp));
             }
 
-
-
-            //pressTimes.Add(new keyPressTimes(e.KeyValue, (keyUp - keyDown)));
-            pressRecords++;
-
-            if ((pressRecords % SEND_INTERVAL) == 0)
+            // if/else for key fly times. Make sure there is 2 keyRecords before collecting
+            if (keyRecords > 1)
             {
-                //Code for sending data...
-                MessageBox.Show("Sending data...");
+                // This is not going to work correctly. Some variables are not updated as they should be. Going to finish when I have more time.
+                secondKey = e.KeyValue;
+                secondKeyDown = keyDownTime;
+                firstKeyUp = keyUpTime;
+                keyFlyTime = secondKeyDown - firstKeyUp;
+                if ((index = flyTimes.FindIndex(c => c.FirstKey == firstKey && c.SecondKey == secondKey)) > -1)
+                {
+                    flyTimes[index].KeyFly.Add(keyFlyTime);
+                }
+                else
+                {
+                    List<uint> temp = new List<uint>();
+                    temp.Add(keyFlyTime);
+                    flyTimes.Add(new keyFlyTimes(firstKey, secondKey, temp));
+                }
+                firstKey = secondKey;
             }
+            else // We only have 1 record. Cannot collect fly times yet.
+            {
+                firstKey = secondKey = e.KeyValue;
+            }
+
+
+
+            ////pressTimes.Add(new keyPressTimes(e.KeyValue, (keyUp - keyDown)));
+            //pressRecords++;
+
+            //if ((pressRecords % SEND_INTERVAL) == 0)
+            //{
+            //    //Code for sending data...
+            //    MessageBox.Show("Sending data...");
+            //}
         }
 
         private void Form2_Load(object sender, EventArgs e)
