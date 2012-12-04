@@ -89,6 +89,7 @@ void BasicProfileEnforcer::dispatcher() {
 
 	bool firstStroke = true;
 	bool lastStrokeDown = true;
+	bool ignoreNextKeyUp = false;
 	bool setToThisDispatchTime;
 
 	// Used to print out the actual time it took for the fly
@@ -129,6 +130,7 @@ void BasicProfileEnforcer::dispatcher() {
                     // We are only concerned about press times which may come between
                     // this key down and the next
                     if (nextStroke->stroke.state == INTERCEPTION_KEY_UP) {
+                        // Get the key down dispatch time for the corresponding key down
                         kd_hist_it = dispatchDownHist.find(nextStroke->stroke.code);
                         if (kd_hist_it == dispatchDownHist.end()) {
                             if (nextStroke->stroke.code == stroke.code) {
@@ -157,18 +159,31 @@ void BasicProfileEnforcer::dispatcher() {
                         // What time will the keyup need to go in order to be on time
                         peekAheadTime =  kd_hist.kd_dispatch_time + pressTime;
 
-                        if (peekAheadTime < nextIterationTime && !this->looseStrokes) {
-                            ChronoMicroDuration difference = nextIterationTime - peekAheadTime;
+                        if (peekAheadTime < nextIterationTime) {
+                            if (this->looseStrokes && !setToThisDispatchTime) {
+                                std::cout << "--------------------- Sending key up to delay queue ----------------------" << std::endl;
+                                // the next keyup is not for this keydown and we are allowed to interleave keys
+                                delayStruct = (KeyUpDelay*) malloc(sizeof(KeyUpDelay));
+                                delayStruct->stroke = nextStroke->stroke;
+                                delayStruct->kd_dispatch_time = kd_hist.kd_dispatch_time;
 
-                            // Split the difference of this duration between this stroke and the next
-                            difference /= 2;
-                            if (difference.count() > MAX_FLY_SPLIT) {
-                                std::cout << "Time Difference " << difference.count() / 1000;
-                                std::cout << " ms is too much to make up" << std::endl;
+                                this->addToDelayDispatch(delayStruct);
+
+                                // So that the key up code section doesn't try to process it
+                                ignoreNextKeyUp = true;
                             } else {
-                                sleepTime -= difference;
+                                ChronoMicroDuration difference = nextIterationTime - peekAheadTime;
 
-                                std::cout << "(peekAhead press): Making up time" << std::endl;
+                                // Split the difference of this duration between this stroke and the next
+                                difference /= 2;
+                                if (difference.count() > MAX_FLY_SPLIT) {
+                                    std::cout << "Time Difference " << difference.count() / 1000;
+                                    std::cout << " ms is too much to make up" << std::endl;
+                                } else {
+                                    sleepTime -= difference;
+
+                                    std::cout << "(peekAhead press): Making up time" << std::endl;
+                                }
                             }
                         }
                     }
@@ -214,6 +229,16 @@ void BasicProfileEnforcer::dispatcher() {
 			if (kd_hist_it == dispatchDownHist.end()) {
 				std::cerr << "Received key up stroke with no previous corresponding key down" << std::endl;
 				exit(-1);
+			}
+
+			if (ignoreNextKeyUp) {
+                dispatchDownHist.erase(kd_hist_it);
+                free(pStroke);
+
+                lastStrokeDown = false;
+                ignoreNextKeyUp = false;
+
+                continue;
 			}
 
 			// This holds the time the corresponding keydown was sent out
