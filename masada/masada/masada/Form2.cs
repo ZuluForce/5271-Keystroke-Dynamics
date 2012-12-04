@@ -27,6 +27,8 @@ namespace masada
         private uint secondKeyDown;
         private uint keyFlyTime;
 
+        private uint prevKeyUp;
+
         /* Number of recorded fly times */
         private int flyRecords = 0;
 
@@ -94,6 +96,7 @@ namespace masada
 
         private void typingBoxText_KeyDown(object sender, KeyEventArgs e)
         {
+            prevKeyUp = keyUpTime;
             keyDownTime = ticks;
         }
 
