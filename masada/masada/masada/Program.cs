@@ -14,9 +14,9 @@ namespace masada
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            application.enablevisualstyles();
+            application.setcompatibletextrenderingdefault(false);
+            application.run(new form1());
         }
     }
 }

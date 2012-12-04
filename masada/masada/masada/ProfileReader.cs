@@ -80,6 +80,7 @@ namespace masada
         {
             TestField testField = new TestField();
             testField.numFlyTimes = token.Value<int>("num_fly_times");
+            testField.numPressTimes = token.Value<int>("num_press_times");
             testField.pressMean = token.Value<double>("press_mean");
             testField.pressStdv = token.Value<double>("press_stdv");
             testField.flyMean = token.Value<double>("fly_mean");
@@ -97,7 +98,7 @@ namespace masada
             }
 
 
-            return new TestField();
+            return testField;
         }
 
         private Dictionary<int, Time> createKeyTimeDictionary(List<JToken> tokens)

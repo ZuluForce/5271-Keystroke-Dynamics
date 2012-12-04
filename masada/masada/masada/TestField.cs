@@ -9,6 +9,7 @@ namespace masada
     class TestField
     {
         public int numFlyTimes { get; set; }
+        public int numPressTimes { get; set; }
         public double pressMean { get; set; }
         public double pressStdv { get; set; }
         public double flyMean { get; set; }
