@@ -71,6 +71,21 @@ namespace masada
 
         List<keyFlyTimes> flyTimes = new List<keyFlyTimes>();
 
+        public struct rawTimes
+        {
+            public int Key;
+            public uint DownTime;
+            public uint UpTime;
+            public rawTimes(int key, uint downTime, uint upTime)
+            {
+                Key = key;
+                DownTime = downTime;
+                UpTime = upTime;
+            }
+        }
+
+        List<rawTimes> tempList = new List<rawTimes>();
+
         // this is currently in seconds, probably will change to some other format when needed (2000.0 = 2 seconds)
         double maxFilterTime = 2.0;
         double stdForDistance = 1.0;
@@ -116,6 +131,7 @@ namespace masada
         private void typingBoxText_KeyUp(object sender, KeyEventArgs e)
         {
             keyUpTime = ticks;
+            tempList.Add(new rawTimes(e.KeyValue, keyDownTime, keyUpTime);
             keyRecords++;
             int index;
             keyPressTime = keyUpTime - keyDownTime;
@@ -152,7 +168,6 @@ namespace masada
             // if/else for key fly times. Make sure there is 2 keyRecords before collecting
             if (keyRecords > 1)
             {
-                // This is not going to work correctly. Some variables are not updated as they should be. Going to finish when I have more time.
                 secondKey = tempKeyValue;
                 secondKeyDown = keyDownTime;
                 firstKeyUp = prevKeyUp;
