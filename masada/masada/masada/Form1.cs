@@ -58,10 +58,13 @@ namespace masada
             if (checkUser(usernameTextBox.Text, passwordTextBox.Text))
             {
                 // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
+                /*
                 Form2 form2 = new Form2(null);
                 form2.RefToForm1 = this;
                 form2.Show();
                 this.Hide();
+                 */
+                profileButton_Click(sender, e);
             }
             else
             {
@@ -75,10 +78,13 @@ namespace masada
             if (checkUser(usernameTextBox.Text, passwordTextBox.Text))
             {
                 // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
+                /*
                 Form2 form2 = new Form2(null);
                 form2.RefToForm1 = this;
                 form2.Show();
                 this.Hide();
+                */
+                
             }
             else
             {
@@ -197,7 +203,7 @@ namespace masada
         {
             if (e.KeyCode == Keys.Enter)
             {
-                logingButton_Click();
+                //logingButton_Click();
             }
             else
             {

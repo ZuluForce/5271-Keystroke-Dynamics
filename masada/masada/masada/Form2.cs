@@ -120,9 +120,22 @@ namespace masada
             int index;
             keyPressTime = keyUpTime - keyDownTime;
 
+            int tempKeyValue = -1;
+
+            // Apparently, you can only get the uppercase value of a key in c#
+            // passed in through KeyEventArgs.
+            if (e.KeyValue >= 65 && e.KeyValue <= 90)
+            {
+                tempKeyValue = e.KeyValue + 32;
+            }
+            else
+            {
+                tempKeyValue = e.KeyValue;
+            }
+
             // if/else for key press times
             // key exists in list, add press time to existing object's list
-            if ((index = pressTimes.FindIndex(c => c.Key == e.KeyValue)) > -1)
+            if ((index = pressTimes.FindIndex(c => c.Key == tempKeyValue)) > -1)
             {
                 // add time to that list
                 pressTimes[index].KeyPress.Add(keyPressTime);
@@ -133,14 +146,14 @@ namespace masada
                 // make a new object
                 List<uint> temp = new List<uint>();
                 temp.Add(keyPressTime);
-                pressTimes.Add(new keyPressTimes(e.KeyValue, temp));
+                pressTimes.Add(new keyPressTimes(tempKeyValue, temp));
             }
 
             // if/else for key fly times. Make sure there is 2 keyRecords before collecting
             if (keyRecords > 1)
             {
                 // This is not going to work correctly. Some variables are not updated as they should be. Going to finish when I have more time.
-                secondKey = e.KeyValue;
+                secondKey = tempKeyValue;
                 secondKeyDown = keyDownTime;
                 firstKeyUp = prevKeyUp;
                 keyFlyTime = secondKeyDown - firstKeyUp;
@@ -158,7 +171,7 @@ namespace masada
             }
             else // We only have 1 record. Cannot collect fly times yet.
             {
-                firstKey = secondKey = e.KeyValue;
+                firstKey = secondKey = tempKeyValue;
             }
         }
 
@@ -363,17 +376,72 @@ namespace masada
             //This is where the magic of checking the distance will happen. For now, nothing.
             double distance = 0; // <- this will be Mahalanobis(x, y);
             double distanceStd = getStdDev();
+            int sizeCounter = 0;
 
+            List<keyPressTimes> tempPressTimes = pressTimes;
 
-            // need to remove the TRUE part here!!!!! (just for testing)
-            if (distance > distanceStd || true)
+            List<keyFlyTimes> tempFlyTimes = flyTimes;
+
+            foreach (keyPressTimes temp in tempPressTimes)
             {
-                MessageBox.Show("You appear to be an intruder. Please leave. Your mahalanobis distance was: " + distance + getFacePalm(), "Ahhhh", MessageBoxButtons.YesNo);
+                if (temp.Key == 13)
+                {
+                    continue;
+                }
+                foreach (uint t in temp.KeyPress)
+                {
+                    sizeCounter++;
+                }
+            }
+
+
+            Matrix collectedPressTimes = new Matrix(sizeCounter, 1);
+
+            int i = 0;
+
+            foreach (keyPressTimes temp in tempPressTimes)
+            {
+                if (i >= sizeCounter)
+                {
+                    break;
+                }
+                foreach (uint t in temp.KeyPress)
+                {
+                    collectedPressTimes.mat[i, 0] = t;
+                    i++;
+                }
+            }
+
+            double[] arrayPressTimes = profileReader.getKeyPressProfileData(tempPressTimes);
+            Matrix profilePressTimes = new Matrix(arrayPressTimes.Length, 1);
+
+
+            for (int j = 0; j < arrayPressTimes.Length; j++)
+            {
+                profilePressTimes.mat[j, 0] = arrayPressTimes[j];
+            }
+
+
+            Matrix testCollected = new Matrix(4, 1);
+
+            testCollected.mat[0, 0] = 128.11;
+            testCollected.mat[1, 0] = 128.11;
+            testCollected.mat[2, 0] = 118.59;
+            testCollected.mat[3, 0] = 120.13;
+
+            //distance = Mahalanobis(profilePressTimes, collectedPressTimes);
+            distance = Mahalanobis(profilePressTimes, testCollected);
+
+
+            
+            if (distance > distanceStd)
+            {
+                MessageBox.Show("You appear to be an intruder. Please leave. Your mahalanobis distance was: " + distance + getFacePalm(), "Ahhhh", MessageBoxButtons.OK);
             }
 
             else
             {
-                return;
+                MessageBox.Show("You are who you say you are...I trust you. Your mahalanobis distance was: " + distance, "Carry On", MessageBoxButtons.OK);
             }
 
             return;
