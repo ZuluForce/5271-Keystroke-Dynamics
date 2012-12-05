@@ -73,12 +73,19 @@ namespace masada
 
         // this is currently in seconds, probably will change to some other format when needed (2000.0 = 2 seconds)
         double maxFilterTime = 2.0;
+        double stdForDistance = 1.0;
 
         public Form2(ProfileReader profileReader)
         {
             this.profileReader = profileReader;
             InitializeComponent();
+            stdBox.Text = stdForDistance.ToString();
             typingBoxText.Text = "Feel free to type, it will not be saved...";
+            paragraphText.Text = "So then, his armour being furbished, his morion turned into a helmet, his hack christened, and he himself confirmed, he came to the conclusion that nothing more was needed now but to look out for a lady to be in love with; for a knight-errant without love was like a tree without leaves or fruit, or a body without a soul. As he said to himself, \"If, for my sins, or by my good fortune, I come across some giant hereabouts, a common occurrence with knights-errant, and overthrow him in one onslaught, or cleave him asunder to the waist, or, in short, vanquish and subdue him, will it not be well to have some one I may send him to as a present, that he may come in and fall on his knees before my sweet lady, and in a humble, submissive voice say, 'I am the giant Caraculiambro, lord of the island of Malindrania, vanquished in single combat by the never sufficiently extolled knight Don Quixote of La Mancha, who has commanded me to present myself before your Grace, that your Highness dispose of me at your pleasure'?\" Oh, how our good gentleman enjoyed the delivery of this speech, especially when he had thought of some one to call his Lady!";
+            trackBar1.Value = (int) stdForDistance;
+            trackBar1.Minimum = 0;
+            trackBar1.Maximum = 20;
+            trackBar1.TickFrequency = 1;
             timer1.Start();
         }
 
@@ -334,5 +341,77 @@ namespace masada
         {
             ticks++;
         }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            this.stdBox.Text = this.getStdDev().ToString();
+        }
+
+        private double getStdDev()
+        {
+            int std = this.trackBar1.Value;
+
+            double result = 0;
+
+            result = std * 0.25;
+
+            return result;
+        }
+
+        private void profileCheck_Click(object sender, EventArgs e)
+        {
+            //This is where the magic of checking the distance will happen. For now, nothing.
+            double distance = 0; // <- this will be Mahalanobis(x, y);
+            double distanceStd = getStdDev();
+
+
+            // need to remove the TRUE part here!!!!! (just for testing)
+            if (distance > distanceStd || true)
+            {
+                MessageBox.Show("You appear to be an intruder. Please leave. Your mahalanobis distance was: " + distance + getFacePalm(), "Ahhhh", MessageBoxButtons.YesNo);
+            }
+
+            else
+            {
+                return;
+            }
+
+            return;
+
+        }
+
+        private string getFacePalm()
+        {
+            string facepalm = @"
+............................................________ 
+....................................,.-'\""...................``~.,
+.............................,.-\""...................................\""-.,
+.........................,/...............................................\"":,
+.....................,?......................................................,
+.................../...........................................................,}
+................./......................................................,:`^`..}
+.............../...................................................,:\""........./
+..............?.....__.........................................:`.........../
+............./__.(.....\""~-,_..............................,:`........../
+.........../(_....\""~,_........\""~,_....................,:`........_/
+..........{.._$;_......\""=,_.......\""-,_.......,.-~-,},.~\"";/....}
+...........((.....*~_.......\""=-._......\"";,,./`..../\""............../
+...,,,___.`~,......\""~.,....................`.....}............../
+............(....`=-,,.......`........................(......;_,,-\""
+............/.`~,......`-...................................../
+.............`~.*-,.....................................|,./.....,__
+,,_..........}.>-._...................................|..............`=~-,
+.....`=~-,__......`,.................................
+...................`=~-,,.,...............................
+................................`:,,...........................`..............__
+.....................................`=-,...................,%`>--==``
+........................................_..........._,-%.......`
+..................................., ";
+
+            return facepalm;
+
+        }
+
+
     }
 }
