@@ -389,7 +389,8 @@ namespace masada
         private void profileCheck_Click(object sender, EventArgs e)
         {
             //This is where the magic of checking the distance will happen. For now, nothing.
-            double distance = 0; // <- this will be Mahalanobis(x, y);
+            double distancePress = 0; // <- this will be Mahalanobis(x, y);
+            double distanceFly = 0;
             double distanceStd = getStdDev();
             int sizeCounter = 0;
 
@@ -437,19 +438,21 @@ namespace masada
             }
 
 
+            /*
+             * Just type "test" in the entry box.
             Matrix testCollected = new Matrix(4, 1);
 
             testCollected.mat[0, 0] = 128.11;
             testCollected.mat[1, 0] = 128.11;
             testCollected.mat[2, 0] = 118.59;
             testCollected.mat[3, 0] = 120.13;
-
-            //distance = Mahalanobis(profilePressTimes, collectedPressTimes);
-            distance = Mahalanobis(profilePressTimes, testCollected);
+            */
+            distancePress = Mahalanobis(profilePressTimes, collectedPressTimes);
+            //distance = Mahalanobis(profilePressTimes, testCollected);
 
 
             
-            if (distance > distanceStd)
+            if (distancePress > distanceStd)
             {
                 MessageBox.Show("You appear to be an intruder. Please leave. Your mahalanobis distance was: " + distance + getFacePalm(), "Ahhhh", MessageBoxButtons.OK);
             }
