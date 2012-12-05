@@ -20,20 +20,9 @@ namespace masada
 
         private uint keyDownTime, keyUpTime, keyPressTime;
 
-        private int firstKey = -1;
-        private int secondKey = -1;
+        private int firstKey, secondKey;
 
-        private uint firstKeyUp;
-        private uint secondKeyDown;
         private uint keyFlyTime;
-
-        private uint prevKeyUp;
-
-        /* Number of recorded fly times */
-        private int flyRecords = 0;
-
-        /* Number of recorded press times */
-        private int pressRecords = 0;
 
         private int keyRecords = 0;
 
@@ -84,7 +73,7 @@ namespace masada
             }
         }
 
-        List<rawTimes> tempList = new List<rawTimes>();
+        List<rawTimes> allKeys = new List<rawTimes>();
 
         // this is currently in seconds, probably will change to some other format when needed (2000.0 = 2 seconds)
         double maxFilterTime = 2.0;
@@ -97,7 +86,7 @@ namespace masada
             stdBox.Text = stdForDistance.ToString();
             typingBoxText.Text = "Feel free to type, it will not be saved...";
             paragraphText.Text = "So then, his armour being furbished, his morion turned into a helmet, his hack christened, and he himself confirmed, he came to the conclusion that nothing more was needed now but to look out for a lady to be in love with; for a knight-errant without love was like a tree without leaves or fruit, or a body without a soul. As he said to himself, \"If, for my sins, or by my good fortune, I come across some giant hereabouts, a common occurrence with knights-errant, and overthrow him in one onslaught, or cleave him asunder to the waist, or, in short, vanquish and subdue him, will it not be well to have some one I may send him to as a present, that he may come in and fall on his knees before my sweet lady, and in a humble, submissive voice say, 'I am the giant Caraculiambro, lord of the island of Malindrania, vanquished in single combat by the never sufficiently extolled knight Don Quixote of La Mancha, who has commanded me to present myself before your Grace, that your Highness dispose of me at your pleasure'?\" Oh, how our good gentleman enjoyed the delivery of this speech, especially when he had thought of some one to call his Lady!";
-            trackBar1.Value = (int) stdForDistance;
+            trackBar1.Value = (int)stdForDistance;
             trackBar1.Minimum = 0;
             trackBar1.Maximum = 20;
             trackBar1.TickFrequency = 1;
@@ -122,16 +111,12 @@ namespace masada
         private void typingBoxText_KeyDown(object sender, KeyEventArgs e)
         {
             keyDownTime = ticks;
-            if (keyRecords > 0)
-            {
-                prevKeyUp = keyUpTime;
-            }
         }
 
         private void typingBoxText_KeyUp(object sender, KeyEventArgs e)
         {
             keyUpTime = ticks;
-            tempList.Add(new rawTimes(e.KeyValue, keyDownTime, keyUpTime));
+            allKeys.Add(new rawTimes(e.KeyValue, keyDownTime, keyUpTime));
             keyRecords++;
             int index;
             keyPressTime = keyUpTime - keyDownTime;
@@ -168,10 +153,9 @@ namespace masada
             // if/else for key fly times. Make sure there is 2 keyRecords before collecting
             if (keyRecords > 1)
             {
-                secondKey = tempKeyValue;
-                secondKeyDown = keyDownTime;
-                firstKeyUp = prevKeyUp;
-                keyFlyTime = secondKeyDown - firstKeyUp;
+                firstKey = allKeys[keyRecords - 2].Key;
+                secondKey = allKeys[keyRecords - 1].Key;
+                keyFlyTime = allKeys[keyRecords - 1].DownTime - allKeys[keyRecords - 2].DownTime;
                 if ((index = flyTimes.FindIndex(c => c.FirstKey == firstKey && c.SecondKey == secondKey)) > -1)
                 {
                     flyTimes[index].KeyFly.Add(keyFlyTime);
@@ -182,11 +166,10 @@ namespace masada
                     temp.Add(keyFlyTime);
                     flyTimes.Add(new keyFlyTimes(firstKey, secondKey, temp));
                 }
-                firstKey = secondKey;
             }
             else // We only have 1 record. Cannot collect fly times yet.
             {
-                firstKey = secondKey = tempKeyValue;
+
             }
         }
 
@@ -451,7 +434,7 @@ namespace masada
             //distance = Mahalanobis(profilePressTimes, testCollected);
 
 
-            
+
             if (distancePress > distanceStd)
             {
                 MessageBox.Show("You appear to be an intruder. Please leave. Your mahalanobis distance was: " + distancePress + getFacePalm(), "Ahhhh", MessageBoxButtons.OK);
