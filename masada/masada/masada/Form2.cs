@@ -131,7 +131,7 @@ namespace masada
         private void typingBoxText_KeyUp(object sender, KeyEventArgs e)
         {
             keyUpTime = ticks;
-            tempList.Add(new rawTimes(e.KeyValue, keyDownTime, keyUpTime);
+            tempList.Add(new rawTimes(e.KeyValue, keyDownTime, keyUpTime));
             keyRecords++;
             int index;
             keyPressTime = keyUpTime - keyDownTime;
@@ -454,12 +454,12 @@ namespace masada
             
             if (distancePress > distanceStd)
             {
-                MessageBox.Show("You appear to be an intruder. Please leave. Your mahalanobis distance was: " + distance + getFacePalm(), "Ahhhh", MessageBoxButtons.OK);
+                MessageBox.Show("You appear to be an intruder. Please leave. Your mahalanobis distance was: " + distancePress + getFacePalm(), "Ahhhh", MessageBoxButtons.OK);
             }
 
             else
             {
-                MessageBox.Show("You are who you say you are...I trust you. Your mahalanobis distance was: " + distance, "Carry On", MessageBoxButtons.OK);
+                MessageBox.Show("You are who you say you are...I trust you. Your mahalanobis distance was: " + distancePress, "Carry On", MessageBoxButtons.OK);
             }
 
             return;
