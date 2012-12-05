@@ -10,4 +10,3 @@ C:\Users\Ethan\Desktop\5271\masada\masada\masada\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Ethan\Desktop\5271\masada\masada\masada\bin\Debug\Newtonsoft.Json.xml
 C:\Users\Ethan\Desktop\5271\masada\masada\masada\obj\Debug\masada.exe
 C:\Users\Ethan\Desktop\5271\masada\masada\masada\obj\Debug\masada.pdb
-C:\Users\Dylan\Developer\git\CSci-5271-Keystroke-Dynamics\masada\masada\masada\bin\Debug\masada.exe.config
