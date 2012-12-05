@@ -37,6 +37,7 @@
             this.paragraphText = new System.Windows.Forms.TextBox();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.stdBox = new System.Windows.Forms.TextBox();
+            this.profileCheck = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -105,11 +106,22 @@
             this.stdBox.Size = new System.Drawing.Size(49, 20);
             this.stdBox.TabIndex = 7;
             // 
+            // profileCheck
+            // 
+            this.profileCheck.Location = new System.Drawing.Point(704, 121);
+            this.profileCheck.Name = "profileCheck";
+            this.profileCheck.Size = new System.Drawing.Size(98, 40);
+            this.profileCheck.TabIndex = 8;
+            this.profileCheck.Text = "Check Against Profile";
+            this.profileCheck.UseVisualStyleBackColor = true;
+            this.profileCheck.Click += new System.EventHandler(this.profileCheck_Click);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(815, 605);
+            this.Controls.Add(this.profileCheck);
             this.Controls.Add(this.stdBox);
             this.Controls.Add(this.trackBar1);
             this.Controls.Add(this.paragraphText);
@@ -137,5 +149,6 @@
         private System.Windows.Forms.TextBox paragraphText;
         private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.TextBox stdBox;
+        private System.Windows.Forms.Button profileCheck;
     }
 }
