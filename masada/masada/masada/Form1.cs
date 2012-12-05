@@ -25,6 +25,8 @@ namespace masada
         /* How often the data is sent for processing */
         private int SEND_INTERVAL = 25;
 
+        private ProfileReader profileReader = new ProfileReader();
+
         /* Object for storing keystroke data */
         public struct keyRecord
         {
@@ -47,6 +49,8 @@ namespace masada
             passwordTextBox.Text = "";
             passwordTextBox.PasswordChar = '*';
             timer1.Start();
+            profileDropdown.DataSource = profileReader.getProfileNames();
+
         }
 
         private void logingButton_Click(object sender, EventArgs e)
@@ -54,7 +58,7 @@ namespace masada
             if (checkUser(usernameTextBox.Text, passwordTextBox.Text))
             {
                 // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
-                Form2 form2 = new Form2();
+                Form2 form2 = new Form2(null);
                 form2.RefToForm1 = this;
                 form2.Show();
                 this.Hide();
@@ -71,7 +75,7 @@ namespace masada
             if (checkUser(usernameTextBox.Text, passwordTextBox.Text))
             {
                 // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
-                Form2 form2 = new Form2();
+                Form2 form2 = new Form2(null);
                 form2.RefToForm1 = this;
                 form2.Show();
                 this.Hide();
@@ -225,6 +229,26 @@ namespace masada
         private void timer1_Tick(object sender, EventArgs e)
         {
             ticks++;
+        }
+
+        private void profileButton_Click(object sender, EventArgs e)
+        {
+            string name = (string)profileDropdown.SelectedItem;
+            if (name == null)
+            {
+                MessageBox.Show("Profile name is null!", "Nope...", MessageBoxButtons.OK);
+            }
+            else
+            {
+                profileReader.loadProfile(name);
+                // MessageBox.Show("Logged In", "Success", MessageBoxButtons.OK);
+                Form2 form2 = new Form2(profileReader);
+                form2.RefToForm1 = this;
+                form2.Show();
+                this.Hide();
+            }
+
+
         }
 
     }

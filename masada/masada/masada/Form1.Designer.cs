@@ -36,6 +36,8 @@
             this.passwordLabel = new System.Windows.Forms.Label();
             this.usernameLabel = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.profileDropdown = new System.Windows.Forms.ComboBox();
+            this.profileButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // usernameTextBox
@@ -98,9 +100,30 @@
             this.timer1.Interval = 1;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // profileDropdown
+            // 
+            this.profileDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.profileDropdown.FormattingEnabled = true;
+            this.profileDropdown.Location = new System.Drawing.Point(25, 45);
+            this.profileDropdown.Name = "profileDropdown";
+            this.profileDropdown.Size = new System.Drawing.Size(121, 21);
+            this.profileDropdown.TabIndex = 6;
+            // 
+            // profileButton
+            // 
+            this.profileButton.Location = new System.Drawing.Point(25, 77);
+            this.profileButton.Name = "profileButton";
+            this.profileButton.Size = new System.Drawing.Size(75, 23);
+            this.profileButton.TabIndex = 7;
+            this.profileButton.Text = "Use Profile";
+            this.profileButton.UseVisualStyleBackColor = true;
+            this.profileButton.Click += new System.EventHandler(this.profileButton_Click);
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(543, 242);
+            this.Controls.Add(this.profileButton);
+            this.Controls.Add(this.profileDropdown);
             this.Controls.Add(this.usernameLabel);
             this.Controls.Add(this.passwordLabel);
             this.Controls.Add(this.adduserButton);
@@ -122,6 +145,8 @@
         private System.Windows.Forms.Label passwordLabel;
         private System.Windows.Forms.Label usernameLabel;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ComboBox profileDropdown;
+        private System.Windows.Forms.Button profileButton;
 
 
     }

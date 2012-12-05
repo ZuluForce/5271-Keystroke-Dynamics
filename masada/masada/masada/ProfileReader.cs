@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace masada
 {
-    class ProfileReader
+    public class ProfileReader
     {
+        private Profile currentProfile = null;
+
         private String profileDir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\profiles\\";
 
         private String profileSuffix = "_reduced.json";
@@ -30,12 +32,76 @@ namespace masada
             }
         }
 
-        public List<String> getProfiles()
+        public double[] getKeyPressProfileData(List<Form2.keyPressTimes> keyPressTimesList)
+        {
+            //int numPresses = keyPressTimesList.Sum(l => l.KeyPress.Count);
+            //double[] returnTimes = new double[numPresses];
+            List<double> returnTimes = new List<double>();
+            for (int i = 0; i < keyPressTimesList.Count; i++)
+            {
+                Form2.keyPressTimes keyPressTimes = keyPressTimesList[i];
+
+                Time time;
+                int key = keyPressTimes.Key;
+                if (currentProfile.textField.pressTimes.TryGetValue(key, out time))
+                {
+                    for (int j = 0; j < keyPressTimes.KeyPress.Count; j++)
+                    {
+                        returnTimes.Add(time.time);
+                    }
+                }
+                else // Could not find the key
+                {
+                    Console.WriteLine("Could not find key " + key + " in profile's press times");
+                    return null;
+                }
+            }
+            return returnTimes.ToArray();
+        }
+
+        public double[] getKeyFlyProfileData(List<Form2.keyFlyTimes> keyFlyTimesList)
+        {
+            //int numFlyTimes = keyFlyTimesList.Sum(l => l.KeyFly.Count);
+            //double[] returnTimes = new double[numFlyTimes];
+            List<double> returnTimes = new List<double>();
+            for (int i = 0; i < keyFlyTimesList.Count; i++)
+            {
+                Form2.keyFlyTimes keyFlyTimes = keyFlyTimesList[i];
+
+                Dictionary<int, Time> dict;
+                int firstKey = keyFlyTimes.FirstKey;
+                int secondKey = keyFlyTimes.SecondKey;
+                if (currentProfile.textField.flyTimes.TryGetValue(firstKey, out dict))
+                {
+                    Time time;
+                    if (dict.TryGetValue(secondKey, out time))
+                    {
+                        for (int j = 0; j < keyFlyTimes.KeyFly.Count; j++)
+                        {
+                            returnTimes.Add(time.time);
+                        }
+                    }
+                    else // Could not find the second key
+                    {
+                        Console.WriteLine("Could not find 'to' key " + secondKey + " in profile's fly times");
+                        return null;
+                    }
+                }
+                else // Could not find the first key
+                {
+                    Console.WriteLine("Could not find 'from' key " + firstKey + " in profile's fly times");
+                    return null;
+                }
+            }
+            return returnTimes.ToArray();
+        }
+
+        public List<String> getProfileNames()
         {
             return profiles.Keys.ToList<String>();
         }
 
-        public Profile loadProfile(String name)
+        public bool loadProfile(String name)
         {
             Profile profile;
 
@@ -51,12 +117,14 @@ namespace masada
                     JObject json;
                     json = JObject.Parse(line);
                     profile = createProfile(json);
+                    profiles[name] = profile;
                 }
-                return profile;
+                currentProfile = profile;
+                return true;
             }
             else
             {
-                return null; // Name was not in the dictionary
+                return false; // Name was not in the dictionary
             }
         }
 

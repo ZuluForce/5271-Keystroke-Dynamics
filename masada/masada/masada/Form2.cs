@@ -40,6 +40,8 @@ namespace masada
         /* How often the data is sent for processing */
         private int SEND_INTERVAL = 25;
 
+        private ProfileReader profileReader;
+
         /* Object for storing key press times */
         public struct keyPressTimes
         {
@@ -72,8 +74,9 @@ namespace masada
         // this is currently in seconds, probably will change to some other format when needed (2000.0 = 2 seconds)
         double maxFilterTime = 2.0;
 
-        public Form2()
+        public Form2(ProfileReader profileReader)
         {
+            this.profileReader = profileReader;
             InitializeComponent();
             typingBoxText.Text = "Feel free to type, it will not be saved...";
             timer1.Start();
